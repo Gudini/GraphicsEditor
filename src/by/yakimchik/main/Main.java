@@ -1,0 +1,15 @@
+package by.yakimchik.main;
+
+import by.yakimchik.components.Frame;
+
+public class Main {
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		new Frame();
+	}
+
+}
