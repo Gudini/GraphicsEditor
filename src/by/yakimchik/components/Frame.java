@@ -1,5 +1,6 @@
 package by.yakimchik.components;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -25,6 +26,11 @@ public class Frame extends JFrame{
 	
 	private JMenuBar menuBar;
 	
+	private static JLabel status;
+	
+	private static JMenuItem algorithmBrezenhem;
+	private static JMenuItem algorithmDDA;
+	
 	private Container content;
 	
 	public Frame(){
@@ -36,6 +42,9 @@ public class Frame extends JFrame{
 		menuBar.add(createFileMenu());
 		menuBar.add(createDrawMenu());
 		menuBar.add(createWindowMenu());
+		
+		status = new JLabel("Select first point of line");
+		status.setBorder(BorderFactory.createEmptyBorder());
 		
 		setJMenuBar(menuBar);
 		
@@ -53,6 +62,8 @@ public class Frame extends JFrame{
 		
 		content = getContentPane();
 		content.add(creatPanelCells());
+		
+		content.add(status, BorderLayout.SOUTH);
 		
 		this.addWindowListener(new WindowListener() {
 			
@@ -120,8 +131,11 @@ public class Frame extends JFrame{
 	private JMenu createDrawMenu(){
 		JMenu draw = new JMenu("Draw");
 		JMenu lineDraw = new JMenu("Line");
-		JMenuItem algorithmBrezenhem = new JMenuItem(new DrawLineBrezenhemAction());
+		algorithmBrezenhem = new JMenuItem(new DrawLineBrezenhemAction());
 		lineDraw.add(algorithmBrezenhem);
+		algorithmDDA = new JMenuItem(new DrawLineDDA());
+		lineDraw.add(algorithmDDA);
+		EnadleDrawLine(false);
 		draw.add(lineDraw);
 		
 		return draw;
@@ -173,7 +187,7 @@ public class Frame extends JFrame{
 		private static final long serialVersionUID = 1L;
 
 		public DrawLineBrezenhemAction(){
-			putValue(NAME, "Algorithm Brezenhema");
+			putValue(NAME, "Algorithm DDA");
 		}
 		
 		@Override
@@ -186,6 +200,16 @@ public class Frame extends JFrame{
 			
 			int y1 = Coordinates.y_1;
 			int y2 = Coordinates.y_2;
+			
+			if(x1>x2){
+				int h = x1;
+				x1 = x2;
+				x2 = h;
+				
+				h = y1;
+				y1 = y2;
+				y2 = h;
+			}
 			
 			int dx = x2 - x1;
 			int dy = y2 - y1;
@@ -219,15 +243,93 @@ public class Frame extends JFrame{
 			}
 			
 			Coordinates.isCoordinates = true;
+			
+			EnadleDrawLine(false);
+			updateStatus("Select first point of line");
 		}
 		
 	}
 	
-	private class ClearAction extends AbstractAction{
-		
+	private class DrawLineDDA extends AbstractAction{
+
 		/**
 		 * 
 		 */
+		private static final long serialVersionUID = 1L;
+
+		public DrawLineDDA(){
+			putValue(NAME, "Algorithm Brezenhema");
+		}
+		
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO Auto-generated method stub
+			int x, y, dx, dy, incx, incy, pdx, pdy, es, el, err;
+			
+			Coordinates.isCoordinates = false;
+			
+			int x1 = Coordinates.x_1;
+			int x2 = Coordinates.x_2;
+			
+			int y1 = Coordinates.y_1;
+			int y2 = Coordinates.y_2;
+			
+			dx = x2 - x1;
+			dy = y2 - y1;
+			
+			incx = sign(dx);
+			incy = sign(dy);
+			
+			if (dx < 0) dx = -dx;
+			if (dy < 0) dy = -dy;
+			
+			if (dx > dy){
+				pdx = incx;     pdy = 0;
+                es = dy;        el = dx;
+			}
+			else{
+				pdx = 0;        pdy = incy;
+                es = dx;        el = dy;
+			}
+			
+			x = x1;
+			y = y1;
+			
+			err = el/2;
+			
+			biosphere[y][x].setColor(Color.black);
+			biosphere[y][x].drawLine();
+			
+			for (int t = 0; t < el; t++){
+				err -= es;
+				if (err < 0){
+					err += el;
+					x+=incx;
+					y+=incy;
+				}
+				else{
+					x+=pdx;
+					y+=pdy;
+				}
+				
+				biosphere[y][x].setColor(Color.black);
+				biosphere[y][x].drawLine();
+			}
+			
+			Coordinates.isCoordinates = true;
+			
+			EnadleDrawLine(false);
+			updateStatus("Select first point of line");
+		}
+		
+	}
+	
+	private int sign (int x) {
+        return (x > 0) ? 1 : (x < 0) ? -1 : 0;
+	}
+	
+	private class ClearAction extends AbstractAction{
+		
 		private static final long serialVersionUID = 1L;
 
 		public ClearAction(){
@@ -242,6 +344,22 @@ public class Frame extends JFrame{
 					biosphere[i][j].clearCell();
 				}
 			}
+			updateStatus("Select first point of line");
+			
+			EnadleDrawLine(false);
 		}
+	}
+	
+	public static void updateStatus(String text){
+		status.setText(text);
+	}
+	
+	public static void EnadleDrawLine(boolean b){
+		algorithmBrezenhem.setEnabled(b);
+		algorithmDDA.setEnabled(b);
+	}
+	
+	public static boolean getEnableItems(){
+		return algorithmBrezenhem.isEnabled();
 	}
 }

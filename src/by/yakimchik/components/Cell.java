@@ -65,22 +65,27 @@ public class Cell extends JComponent implements MouseListener{
 	@Override
 	public void mousePressed(MouseEvent e) {
 		// TODO Auto-generated method stub
-		this.isLiving = true;
-		setColor(Color.red);
-	    repaint();
-	    
-	    if(Coordinates.isCoordinates){
-		    if(Coordinates.isFirst){
-		    	Coordinates.x_1 = getColumn();
-		    	Coordinates.y_1 = getRow();
-		    	Coordinates.isFirst = false;
+		if(!Frame.getEnableItems()){
+			this.isLiving = true;
+			setColor(Color.red);
+		    repaint();
+		    
+		    if(Coordinates.isCoordinates){
+			    if(Coordinates.isFirst){
+			    	Coordinates.x_1 = getColumn();
+			    	Coordinates.y_1 = getRow();
+			    	Coordinates.isFirst = false;
+			    	Frame.updateStatus("Select second point of line");
+			    }
+			    else{
+			    	Coordinates.x_2 = getColumn();
+			    	Coordinates.y_2 = getRow();
+			    	Coordinates.isFirst = true;
+			    	Frame.updateStatus("Select Draw->Line->... and select algorithm.");
+			    	Frame.EnadleDrawLine(true);
+			    }
 		    }
-		    else{
-		    	Coordinates.x_2 = getColumn();
-		    	Coordinates.y_2 = getRow();
-		    	Coordinates.isFirst = true;
-		    }
-	    }
+		}
 	}
 
 	@Override
