@@ -22,7 +22,7 @@ public class Frame extends JFrame{
 	private static final long serialVersionUID = 1L;
 
 	private Cell[][] biosphere;
-	private final int s = 30;
+	private final int s = 70;
 	
 	private JMenuBar menuBar;
 	
@@ -30,6 +30,8 @@ public class Frame extends JFrame{
 	
 	private static JMenuItem algorithmBrezenhem;
 	private static JMenuItem algorithmDDA;
+	
+	private static JMenuItem algorithmCircle;
 	
 	private Container content;
 	
@@ -61,7 +63,9 @@ public class Frame extends JFrame{
 		setLocation(x, y);
 		
 		content = getContentPane();
-		content.add(creatPanelCells());
+		
+		JScrollPane pane = new JScrollPane(creatPanelCells());
+		content.add(pane);
 		
 		content.add(status, BorderLayout.SOUTH);
 		
@@ -131,12 +135,20 @@ public class Frame extends JFrame{
 	private JMenu createDrawMenu(){
 		JMenu draw = new JMenu("Draw");
 		JMenu lineDraw = new JMenu("Line");
+		JMenu curveDraw = new JMenu("Curve");
+		
 		algorithmBrezenhem = new JMenuItem(new DrawLineBrezenhemAction());
 		lineDraw.add(algorithmBrezenhem);
 		algorithmDDA = new JMenuItem(new DrawLineDDA());
 		lineDraw.add(algorithmDDA);
-		EnadleDrawLine(false);
+		
+		algorithmCircle = new JMenuItem(new CircleAlgorithm());
+		curveDraw.add(algorithmCircle);
+		
+		EnableDrawLine(false);
+		
 		draw.add(lineDraw);
+		draw.add(curveDraw);
 		
 		return draw;
 	}
@@ -156,7 +168,7 @@ public class Frame extends JFrame{
 		for (int ii=0; ii<s; ii++) {
 	          for (int jj=0; jj<s; jj++) {
 	              Cell cell = new Cell(ii,jj);
-	              cell.setPreferredSize(new Dimension(40,40));
+	              cell.setPreferredSize(new Dimension(15,15));
 	              panel.add(cell);
 	              biosphere[ii][jj] = cell;
 	          }
@@ -177,8 +189,13 @@ public class Frame extends JFrame{
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			// TODO Auto-generated method stub
-			setVisible(false);
-			System.exit(0);
+			Object[] options = {"Yes", "No"};
+			if(JOptionPane.showOptionDialog(getWindows()[0], "Close this window?", 
+					"Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+					null, options, options[0])==JOptionPane.YES_OPTION){
+				getWindows()[0].setVisible(false);
+				System.exit(0);
+			}
 		}
 	}
 	
@@ -217,9 +234,21 @@ public class Frame extends JFrame{
 			float m = dy/(float)dx;
 			float b = y1 - m*x1;
 			if(Math.abs(m)<1){
-				for (int x = x1; x <= x2; x++){
-					float y = m*x+b;
-					biosphere[Math.round(y)][x].setColor(Color.black);
+				int x;
+				float y = 0;
+				for (x = x1; x <= x2; x++){
+					y = m*x+b;
+					if(x==x1){
+						biosphere[Math.round(y)][x].setColor(Color.green);
+					}
+					else{
+						if(x==x2){
+							biosphere[Math.round(y)][x].setColor(Color.green);
+						}
+						else{
+							biosphere[Math.round(y)][x].setColor(Color.black);
+						}
+					}
 					biosphere[Math.round(y)][x].drawLine();
 				}
 			}
@@ -237,14 +266,24 @@ public class Frame extends JFrame{
 					else{
 						x = x1;
 					}
-					biosphere[y][Math.round(x)].setColor(Color.black);
+					if(y==y1){
+						biosphere[y][Math.round(x)].setColor(Color.green);
+					}
+					else{
+						if(y==y2){
+							biosphere[y][Math.round(x)].setColor(Color.green);
+						}
+						else{
+							biosphere[y][Math.round(x)].setColor(Color.black);
+						}
+					}
 					biosphere[y][Math.round(x)].drawLine();
 				}
 			}
 			
 			Coordinates.isCoordinates = true;
 			
-			EnadleDrawLine(false);
+			EnableDrawLine(false);
 			updateStatus("Select first point of line");
 		}
 		
@@ -297,7 +336,7 @@ public class Frame extends JFrame{
 			
 			err = el/2;
 			
-			biosphere[y][x].setColor(Color.black);
+			biosphere[y][x].setColor(Color.green);
 			biosphere[y][x].drawLine();
 			
 			for (int t = 0; t < el; t++){
@@ -316,9 +355,12 @@ public class Frame extends JFrame{
 				biosphere[y][x].drawLine();
 			}
 			
+			biosphere[y][x].setColor(Color.green);
+			biosphere[y][x].drawLine();
+			
 			Coordinates.isCoordinates = true;
 			
-			EnadleDrawLine(false);
+			EnableDrawLine(false);
 			updateStatus("Select first point of line");
 		}
 		
@@ -346,7 +388,9 @@ public class Frame extends JFrame{
 			}
 			updateStatus("Select first point of line");
 			
-			EnadleDrawLine(false);
+			Coordinates.isCoordinates = true;
+			
+			EnableDrawLine(false);
 		}
 	}
 	
@@ -354,12 +398,113 @@ public class Frame extends JFrame{
 		status.setText(text);
 	}
 	
-	public static void EnadleDrawLine(boolean b){
+	public static void EnableDrawLine(boolean b){
 		algorithmBrezenhem.setEnabled(b);
 		algorithmDDA.setEnabled(b);
+		algorithmCircle.setEnabled(b);
 	}
 	
 	public static boolean getEnableItems(){
 		return algorithmBrezenhem.isEnabled();
+	}
+	
+	private class CircleAlgorithm extends AbstractAction{
+		
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
+		public CircleAlgorithm(){
+			putValue(NAME, "Circle");
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			// TODO Auto-generated method stub
+			
+			Coordinates.isCoordinates = false;
+			
+			int x1 = Coordinates.x_1;
+			int x2 = Coordinates.x_2;
+			
+			int y1 = Coordinates.y_1;
+			int y2 = Coordinates.y_2;
+			
+			int radius = (int) Math.sqrt(Math.pow(x2-x1, 2)+Math.pow(y2-y1, 2));
+			
+			int p = 1-radius;
+			
+			ScreenPt circPt = new ScreenPt();
+			
+			circPt.setCoords(0, radius);
+			
+			circlePlotPoints(x1, y1, circPt, Color.green);
+			
+			while(circPt.getX()<circPt.getY()){
+				circPt.incrementX();
+				if(p<0){
+					p+=2*circPt.getX()+1;
+				}
+				else{
+					circPt.decrementY();
+					p+=2*(circPt.getX()-circPt.getY())+1;
+				}
+				circlePlotPoints(x1, y1, circPt, Color.black);
+			}
+			
+			Coordinates.isCoordinates = true;
+			
+			EnableDrawLine(false);
+			updateStatus("Select first point of line");
+		}
+		
+		private class ScreenPt{
+			
+			private int x;
+			private int y;
+			
+			public ScreenPt(){
+				x = y = 0;
+			}
+			
+			public void setCoords(int xCoordValue, int yCoordValue){
+				x = xCoordValue;
+				y = yCoordValue;
+			}
+			
+			public int getX(){
+				return x;
+			}
+			
+			public int getY(){
+				return y;
+			}
+			
+			public void incrementX(){
+				x++;
+			}
+			
+			public void decrementY(){
+				y--;
+			}
+		}
+		
+		private void setPixel(int xCoord, int yCoord, Color color){
+			biosphere[yCoord][xCoord].setColor(color);
+			biosphere[yCoord][xCoord].drawLine();
+		}
+		
+		private void circlePlotPoints(int xc, int yc, ScreenPt circPt, Color color){
+			setPixel(xc+circPt.getX(), yc+circPt.getY(), color);
+			setPixel(xc-circPt.getX(), yc+circPt.getY(), color);
+			setPixel(xc+circPt.getX(), yc-circPt.getY(), color);
+			setPixel(xc-circPt.getX(), yc-circPt.getY(), color);
+			setPixel(xc+circPt.getY(), yc+circPt.getX(), color);
+			setPixel(xc-circPt.getY(), yc+circPt.getX(), color);
+			setPixel(xc+circPt.getY(), yc-circPt.getX(), color);
+			setPixel(xc-circPt.getY(), yc-circPt.getX(), color);
+		}
+		
 	}
 }
