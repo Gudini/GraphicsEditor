@@ -14,6 +14,9 @@ import javax.swing.*;
 
 import by.yakimchik.data.Coordinates;
 
+/*
+ * main window
+ */
 public class Frame extends JFrame{
 	
 	/**
