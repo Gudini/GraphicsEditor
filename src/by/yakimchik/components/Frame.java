@@ -24,16 +24,21 @@ public class Frame extends JFrame{
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private Cell[][] biosphere;
+	/** Array of components */
+	private Cell[][] pixels;
+	
+	/** Numbers pixels in window of width and height */
 	private final int s = 70;
 	
+	/** Menu in window */
 	private JMenuBar menuBar;
 	
+	/** Status label in window */
 	private static JLabel status;
 	
+	/** Menu of Draw menu */
 	private static JMenuItem algorithmBrezenhem;
 	private static JMenuItem algorithmDDA;
-	
 	private static JMenuItem algorithmCircle;
 	
 	private Container content;
@@ -165,7 +170,7 @@ public class Frame extends JFrame{
 	}
 		
 	private JPanel creatPanelCells(){
-		biosphere = new Cell[s][s];
+		pixels = new Cell[s][s];
 		final JPanel panel = new JPanel(new GridLayout(s,s,1,1));
 		
 		for (int ii=0; ii<s; ii++) {
@@ -173,7 +178,7 @@ public class Frame extends JFrame{
 	              Cell cell = new Cell(ii,jj);
 	              cell.setPreferredSize(new Dimension(15,15));
 	              panel.add(cell);
-	              biosphere[ii][jj] = cell;
+	              pixels[ii][jj] = cell;
 	          }
 	      }
 		
@@ -242,17 +247,17 @@ public class Frame extends JFrame{
 				for (x = x1; x <= x2; x++){
 					y = m*x+b;
 					if(x==x1){
-						biosphere[Math.round(y)][x].setColor(Color.green);
+						pixels[Math.round(y)][x].setColor(Color.green);
 					}
 					else{
 						if(x==x2){
-							biosphere[Math.round(y)][x].setColor(Color.green);
+							pixels[Math.round(y)][x].setColor(Color.green);
 						}
 						else{
-							biosphere[Math.round(y)][x].setColor(Color.black);
+							pixels[Math.round(y)][x].setColor(Color.black);
 						}
 					}
-					biosphere[Math.round(y)][x].drawLine();
+					pixels[Math.round(y)][x].drawLine();
 				}
 			}
 			if(Math.abs(m)>=1){
@@ -270,17 +275,17 @@ public class Frame extends JFrame{
 						x = x1;
 					}
 					if(y==y1){
-						biosphere[y][Math.round(x)].setColor(Color.green);
+						pixels[y][Math.round(x)].setColor(Color.green);
 					}
 					else{
 						if(y==y2){
-							biosphere[y][Math.round(x)].setColor(Color.green);
+							pixels[y][Math.round(x)].setColor(Color.green);
 						}
 						else{
-							biosphere[y][Math.round(x)].setColor(Color.black);
+							pixels[y][Math.round(x)].setColor(Color.black);
 						}
 					}
-					biosphere[y][Math.round(x)].drawLine();
+					pixels[y][Math.round(x)].drawLine();
 				}
 			}
 			
@@ -339,8 +344,8 @@ public class Frame extends JFrame{
 			
 			err = el/2;
 			
-			biosphere[y][x].setColor(Color.green);
-			biosphere[y][x].drawLine();
+			pixels[y][x].setColor(Color.green);
+			pixels[y][x].drawLine();
 			
 			for (int t = 0; t < el; t++){
 				err -= es;
@@ -354,12 +359,12 @@ public class Frame extends JFrame{
 					y+=pdy;
 				}
 				
-				biosphere[y][x].setColor(Color.black);
-				biosphere[y][x].drawLine();
+				pixels[y][x].setColor(Color.black);
+				pixels[y][x].drawLine();
 			}
 			
-			biosphere[y][x].setColor(Color.green);
-			biosphere[y][x].drawLine();
+			pixels[y][x].setColor(Color.green);
+			pixels[y][x].drawLine();
 			
 			Coordinates.isCoordinates = true;
 			
@@ -386,7 +391,7 @@ public class Frame extends JFrame{
 			// TODO Auto-generated method stub
 			for(int i=0; i<s; i++){
 				for(int j=0; j<s; j++){
-					biosphere[i][j].clearCell();
+					pixels[i][j].clearCell();
 				}
 			}
 			updateStatus("Select first point of line");
@@ -494,8 +499,8 @@ public class Frame extends JFrame{
 		}
 		
 		private void setPixel(int xCoord, int yCoord, Color color){
-			biosphere[yCoord][xCoord].setColor(color);
-			biosphere[yCoord][xCoord].drawLine();
+			pixels[yCoord][xCoord].setColor(color);
+			pixels[yCoord][xCoord].drawLine();
 		}
 		
 		private void circlePlotPoints(int xc, int yc, ScreenPt circPt, Color color){
