@@ -9,10 +9,13 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.util.ArrayList;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 
 import by.yakimchik.data.Coordinates;
+import by.yakimchik.algorithms.*;
 
 /*
  * main window
@@ -37,11 +40,23 @@ public class Frame extends JFrame{
 	private static JLabel status;
 	
 	/** Menu of Draw menu */
-	private static JMenuItem algorithmBrezenhem;
-	private static JMenuItem algorithmDDA;
-	private static JMenuItem algorithmCircle;
+	private static JCheckBoxMenuItem algorithmBrezenhem;
+	private static JCheckBoxMenuItem algorithmDDA;
+	private static JCheckBoxMenuItem algorithmCircle;
+	
+	private static JButton drawButton;
+	private static JButton stepButton;
+	private JButton stopButton;
 	
 	private Container content;
+	
+	private boolean isFirstStep;
+	
+	private static int cur = 0;
+	private ArrayList<Integer> _X;
+	private ArrayList<Integer> _Y;
+	
+	private static boolean enable = false;
 	
 	public Frame(){
 		super("Graphics Editor");
@@ -128,6 +143,110 @@ public class Frame extends JFrame{
 				
 			}
 		});
+		isFirstStep = true;
+		
+		drawButton = new JButton("Draw");
+		stepButton = new JButton(new AbstractAction() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				if(algorithmBrezenhem.isSelected()){
+					if(isFirstStep){
+						BrezenhemAlgorithm alg = new BrezenhemAlgorithm();
+						_X = alg.getXList();
+						_Y = alg.getYList();
+						
+						pixels[_Y.get(0)][_X.get(0)].setColor(Color.green);
+						pixels[_Y.get(0)][_X.get(0)].setPixel();
+						
+						cur = 1;
+						
+						isFirstStep = false;
+						drawButton.setEnabled(false);
+					}
+					else{
+						if(cur==_X.size()-1){
+							pixels[_Y.get(_Y.size()-1)][_X.get(_X.size()-1)].setColor(Color.green);
+							pixels[_Y.get(_Y.size()-1)][_X.get(_X.size()-1)].setPixel();
+							
+							EnableDrawLine(false);
+							
+							isFirstStep = true;
+							cur = 0;
+						}
+						else{
+							pixels[_Y.get(cur)][_X.get(cur)].setColor(Color.black);
+							pixels[_Y.get(cur)][_X.get(cur)].setPixel();
+						}
+						
+						cur++;
+					}					
+				}
+				if(algorithmDDA.isSelected()){
+					if(isFirstStep){
+						DDAlgorithm alg = new DDAlgorithm();
+						_X = alg.getXList();
+						_Y = alg.getYList();
+						
+						pixels[_Y.get(0)][_X.get(0)].setColor(Color.green);
+						pixels[_Y.get(0)][_X.get(0)].setPixel();
+						
+						cur = 1;
+						
+						isFirstStep = false;
+						drawButton.setEnabled(false);
+					}
+					else{
+						if(cur==_X.size()-1){
+							pixels[_Y.get(_Y.size()-1)][_X.get(_X.size()-1)].setColor(Color.green);
+							pixels[_Y.get(_Y.size()-1)][_X.get(_X.size()-1)].setPixel();
+							
+							EnableDrawLine(false);
+							
+							isFirstStep = true;
+							cur = 0;
+						}
+						else{
+							pixels[_Y.get(cur)][_X.get(cur)].setColor(Color.black);
+							pixels[_Y.get(cur)][_X.get(cur)].setPixel();
+						}
+						
+						cur++;
+					}					
+				}
+			}
+		});
+		stepButton.setText("Step");
+		stopButton = new JButton("Stop");
+		
+		enable = false;
+		drawButton.setAction(new DrawButton());
+		
+		JPanel debugPanel = new JPanel();
+		Border eastBorder = BorderFactory.createTitledBorder("Debug");
+		debugPanel.setBorder(eastBorder);
+		debugPanel.setLayout(new BoxLayout(debugPanel, BoxLayout.X_AXIS));
+		debugPanel.add(stopButton);
+		debugPanel.add(stepButton);
+		stopButton.setAlignmentX(-20);
+		stepButton.setAlignmentX(20);
+		
+		
+		JPanel east_panel = new JPanel();
+		east_panel.setLayout(new BoxLayout(east_panel, BoxLayout.Y_AXIS));
+		east_panel.add(drawButton);		
+		drawButton.setAlignmentX(CENTER_ALIGNMENT);
+		EnableDrawLine(false);
+		east_panel.add(debugPanel, BorderLayout.NORTH);
+		
+		//clear button
+		JButton clearButton = new JButton();
+		east_panel.add(clearButton);
+		clearButton.setAlignmentX(CENTER_ALIGNMENT);
+		clearButton.setAction(new ClearAction());
+		
+		content.add(east_panel, BorderLayout.EAST);
 		
 		setVisible(true);
 	}
@@ -144,19 +263,69 @@ public class Frame extends JFrame{
 		JMenu draw = new JMenu("Draw");
 		JMenu lineDraw = new JMenu("Line");
 		JMenu curveDraw = new JMenu("Curve");
+		JMenu colorMenu = new JMenu("Color");
 		
-		algorithmBrezenhem = new JMenuItem(new DrawLineBrezenhemAction());
-		lineDraw.add(algorithmBrezenhem);
-		algorithmDDA = new JMenuItem(new DrawLineDDA());
+		algorithmDDA = new JCheckBoxMenuItem();
+		algorithmDDA.setAction(new AbstractAction() {
+			
+			/**
+			 * @serial default id
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				if(algorithmBrezenhem.isSelected()){
+					algorithmBrezenhem.setSelected(false);
+					algorithmDDA.setSelected(true);
+				}
+				else{
+					algorithmDDA.setSelected(true);
+				}
+			}
+		});
+		algorithmDDA.setText("Algorithm DDA");
+		algorithmDDA.setSelected(true);
+		
 		lineDraw.add(algorithmDDA);
 		
-		algorithmCircle = new JMenuItem(new CircleAlgorithm());
+		algorithmBrezenhem = new JCheckBoxMenuItem("Algorithm Brezenhema");
+		algorithmBrezenhem.setAction(new AbstractAction() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				if(algorithmDDA.isSelected()){
+					algorithmDDA.setSelected(false);
+					algorithmBrezenhem.setSelected(true);
+				}
+				else{
+					algorithmBrezenhem.setSelected(true);
+				}
+			}
+		});
+		algorithmBrezenhem.setText("Algorithm Brezenhema");
+		lineDraw.add(algorithmBrezenhem);
+		
+		algorithmCircle = new JCheckBoxMenuItem();
 		curveDraw.add(algorithmCircle);
 		
-		EnableDrawLine(false);
+		JMenuItem selectColor = new JMenuItem("Select color");
+		selectColor.setAction(new AbstractAction() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		
+		//EnableDrawLine(false);
 		
 		draw.add(lineDraw);
-		draw.add(curveDraw);
+		//draw.add(curveDraw);
+		//sdraw.add(colorMenu);
 		
 		return draw;
 	}
@@ -207,177 +376,6 @@ public class Frame extends JFrame{
 		}
 	}
 	
-	private class DrawLineBrezenhemAction extends AbstractAction{
-
-		private static final long serialVersionUID = 1L;
-
-		public DrawLineBrezenhemAction(){
-			putValue(NAME, "Algorithm DDA");
-		}
-		
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			// TODO Auto-generated method stub
-			Coordinates.isCoordinates = false;
-			
-			int x1 = Coordinates.x_1;
-			int x2 = Coordinates.x_2;
-			
-			int y1 = Coordinates.y_1;
-			int y2 = Coordinates.y_2;
-			
-			if(x1>x2){
-				int h = x1;
-				x1 = x2;
-				x2 = h;
-				
-				h = y1;
-				y1 = y2;
-				y2 = h;
-			}
-			
-			int dx = x2 - x1;
-			int dy = y2 - y1;
-			
-			float m = dy/(float)dx;
-			float b = y1 - m*x1;
-			if(Math.abs(m)<1){
-				int x;
-				float y = 0;
-				for (x = x1; x <= x2; x++){
-					y = m*x+b;
-					if(x==x1){
-						pixels[Math.round(y)][x].setColor(Color.green);
-					}
-					else{
-						if(x==x2){
-							pixels[Math.round(y)][x].setColor(Color.green);
-						}
-						else{
-							pixels[Math.round(y)][x].setColor(Color.black);
-						}
-					}
-					pixels[Math.round(y)][x].drawLine();
-				}
-			}
-			if(Math.abs(m)>=1){
-				if(y1>y2){
-					int k = y2;
-					y2 = y1;
-					y1 = k; 
-				}
-				for (int y = y1; y <= y2; y++){
-					float x;
-					if(dx!=0){
-						x = (y-b)/m;
-					}
-					else{
-						x = x1;
-					}
-					if(y==y1){
-						pixels[y][Math.round(x)].setColor(Color.green);
-					}
-					else{
-						if(y==y2){
-							pixels[y][Math.round(x)].setColor(Color.green);
-						}
-						else{
-							pixels[y][Math.round(x)].setColor(Color.black);
-						}
-					}
-					pixels[y][Math.round(x)].drawLine();
-				}
-			}
-			
-			Coordinates.isCoordinates = true;
-			
-			EnableDrawLine(false);
-			updateStatus("Select first point of line");
-		}
-		
-	}
-	
-	private class DrawLineDDA extends AbstractAction{
-
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 1L;
-
-		public DrawLineDDA(){
-			putValue(NAME, "Algorithm Brezenhema");
-		}
-		
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			// TODO Auto-generated method stub
-			int x, y, dx, dy, incx, incy, pdx, pdy, es, el, err;
-			
-			Coordinates.isCoordinates = false;
-			
-			int x1 = Coordinates.x_1;
-			int x2 = Coordinates.x_2;
-			
-			int y1 = Coordinates.y_1;
-			int y2 = Coordinates.y_2;
-			
-			dx = x2 - x1;
-			dy = y2 - y1;
-			
-			incx = sign(dx);
-			incy = sign(dy);
-			
-			if (dx < 0) dx = -dx;
-			if (dy < 0) dy = -dy;
-			
-			if (dx > dy){
-				pdx = incx;     pdy = 0;
-                es = dy;        el = dx;
-			}
-			else{
-				pdx = 0;        pdy = incy;
-                es = dx;        el = dy;
-			}
-			
-			x = x1;
-			y = y1;
-			
-			err = el/2;
-			
-			pixels[y][x].setColor(Color.green);
-			pixels[y][x].drawLine();
-			
-			for (int t = 0; t < el; t++){
-				err -= es;
-				if (err < 0){
-					err += el;
-					x+=incx;
-					y+=incy;
-				}
-				else{
-					x+=pdx;
-					y+=pdy;
-				}
-				
-				pixels[y][x].setColor(Color.black);
-				pixels[y][x].drawLine();
-			}
-			
-			pixels[y][x].setColor(Color.green);
-			pixels[y][x].drawLine();
-			
-			Coordinates.isCoordinates = true;
-			
-			EnableDrawLine(false);
-			updateStatus("Select first point of line");
-		}
-		
-	}
-	
-	private int sign (int x) {
-        return (x > 0) ? 1 : (x < 0) ? -1 : 0;
-	}
-	
 	private class ClearAction extends AbstractAction{
 		
 		private static final long serialVersionUID = 1L;
@@ -407,111 +405,90 @@ public class Frame extends JFrame{
 	}
 	
 	public static void EnableDrawLine(boolean b){
-		algorithmBrezenhem.setEnabled(b);
-		algorithmDDA.setEnabled(b);
-		algorithmCircle.setEnabled(b);
+		drawButton.setEnabled(b);
+		stepButton.setEnabled(b);
+		enable = b;
 	}
 	
 	public static boolean getEnableItems(){
-		return algorithmBrezenhem.isEnabled();
+		return enable; 
+	}
+		
+	private void DrawLineBrezenhemAlgorithm(){
+		BrezenhemAlgorithm alg = new BrezenhemAlgorithm();
+		
+		ArrayList<Integer> X = alg.getXList();
+		ArrayList<Integer> Y = alg.getYList();
+		for(int i=0; i<X.size(); i++){
+			pixels[Y.get(i)][X.get(i)].setColor(Color.black);
+			pixels[Y.get(i)][X.get(i)].setPixel();
+		}
+		
+		pixels[Y.get(0)][X.get(0)].setColor(Color.green);
+		pixels[Y.get(0)][X.get(0)].setPixel();
+		
+		pixels[Y.get(Y.size()-1)][X.get(X.size()-1)].setColor(Color.green);
+		pixels[Y.get(Y.size()-1)][X.get(X.size()-1)].setPixel();
+		
+		EnableDrawLine(false);
+		updateStatus("Select first point of line");
 	}
 	
-	private class CircleAlgorithm extends AbstractAction{
+	private void DrawLineDDAAlgorithm(){
+		
+		DDAlgorithm alg = new DDAlgorithm();
+		
+		ArrayList<Integer> X = alg.getXList();
+		ArrayList<Integer> Y = alg.getYList();
+		for(int i=0; i<X.size(); i++){
+			pixels[Y.get(i)][X.get(i)].setColor(Color.black);
+			pixels[Y.get(i)][X.get(i)].setPixel();
+		}
+		
+		pixels[Y.get(0)][X.get(0)].setColor(Color.green);
+		pixels[Y.get(0)][X.get(0)].setPixel();
+		
+		pixels[Y.get(Y.size()-1)][X.get(X.size()-1)].setColor(Color.green);
+		pixels[Y.get(Y.size()-1)][X.get(X.size()-1)].setPixel();
+		
+		EnableDrawLine(false);
+		updateStatus("Select first point of line");
+	}
+	
+	private void DrawCircleAlgorithm(){
+		CircleAlgorithm alg = new CircleAlgorithm();
+		
+		ArrayList<Integer> X = alg.getXList();
+		ArrayList<Integer> Y = alg.getYList();
+		for(int i=0; i<X.size(); i++){
+			pixels[Y.get(i)][X.get(i)].setColor(Color.black);
+			pixels[Y.get(i)][X.get(i)].setPixel();
+		}
+		
+		EnableDrawLine(false);
+		updateStatus("Select first point of line");
+	}
+	
+	private class DrawButton extends AbstractAction{
 		
 		/**
-		 * 
+		 * @serial default id
 		 */
 		private static final long serialVersionUID = 1L;
 
-		public CircleAlgorithm(){
-			putValue(NAME, "Circle");
+		public DrawButton(){
+			putValue(NAME, "Draw");
 		}
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			// TODO Auto-generated method stub
-			
-			Coordinates.isCoordinates = false;
-			
-			int x1 = Coordinates.x_1;
-			int x2 = Coordinates.x_2;
-			
-			int y1 = Coordinates.y_1;
-			int y2 = Coordinates.y_2;
-			
-			int radius = (int) Math.sqrt(Math.pow(x2-x1, 2)+Math.pow(y2-y1, 2));
-			
-			int p = 1-radius;
-			
-			ScreenPt circPt = new ScreenPt();
-			
-			circPt.setCoords(0, radius);
-			
-			circlePlotPoints(x1, y1, circPt, Color.green);
-			
-			while(circPt.getX()<circPt.getY()){
-				circPt.incrementX();
-				if(p<0){
-					p+=2*circPt.getX()+1;
-				}
-				else{
-					circPt.decrementY();
-					p+=2*(circPt.getX()-circPt.getY())+1;
-				}
-				circlePlotPoints(x1, y1, circPt, Color.black);
+			if(algorithmBrezenhem.isSelected()){
+				DrawLineBrezenhemAlgorithm();
 			}
-			
-			Coordinates.isCoordinates = true;
-			
-			EnableDrawLine(false);
-			updateStatus("Select first point of line");
-		}
-		
-		private class ScreenPt{
-			
-			private int x;
-			private int y;
-			
-			public ScreenPt(){
-				x = y = 0;
+			if(algorithmDDA.isSelected()){
+				DrawLineDDAAlgorithm();
 			}
-			
-			public void setCoords(int xCoordValue, int yCoordValue){
-				x = xCoordValue;
-				y = yCoordValue;
-			}
-			
-			public int getX(){
-				return x;
-			}
-			
-			public int getY(){
-				return y;
-			}
-			
-			public void incrementX(){
-				x++;
-			}
-			
-			public void decrementY(){
-				y--;
-			}
-		}
-		
-		private void setPixel(int xCoord, int yCoord, Color color){
-			pixels[yCoord][xCoord].setColor(color);
-			pixels[yCoord][xCoord].drawLine();
-		}
-		
-		private void circlePlotPoints(int xc, int yc, ScreenPt circPt, Color color){
-			setPixel(xc+circPt.getX(), yc+circPt.getY(), color);
-			setPixel(xc-circPt.getX(), yc+circPt.getY(), color);
-			setPixel(xc+circPt.getX(), yc-circPt.getY(), color);
-			setPixel(xc-circPt.getX(), yc-circPt.getY(), color);
-			setPixel(xc+circPt.getY(), yc+circPt.getX(), color);
-			setPixel(xc-circPt.getY(), yc+circPt.getX(), color);
-			setPixel(xc+circPt.getY(), yc-circPt.getX(), color);
-			setPixel(xc-circPt.getY(), yc-circPt.getX(), color);
 		}
 		
 	}

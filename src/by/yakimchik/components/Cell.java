@@ -118,7 +118,7 @@ public class Cell extends JComponent implements MouseListener{
 		return this.color;
 	}
 	
-	public void drawLine(){
+	public void setPixel(){
 		this.isLiving = true;
 		repaint();
 	}
