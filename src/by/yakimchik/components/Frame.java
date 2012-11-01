@@ -45,8 +45,8 @@ public class Frame extends JFrame{
 	private static JCheckBoxMenuItem algorithmCircle;
 	
 	private static JButton drawButton;
-	private static JButton stepButton;
-	private JButton stopButton;
+	private static JButton nextStepButton;
+	private static JButton prevStepButton;
 	
 	private Container content;
 	
@@ -73,7 +73,7 @@ public class Frame extends JFrame{
 		
 		setJMenuBar(menuBar);
 		
-		setSize(600, 600);
+		setSize(800, 600);
 		
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		
@@ -146,79 +146,24 @@ public class Frame extends JFrame{
 		isFirstStep = true;
 		
 		drawButton = new JButton("Draw");
-		stepButton = new JButton(new AbstractAction() {
+		nextStepButton = new JButton(new AbstractAction() {
 			
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
-				if(algorithmBrezenhem.isSelected()){
-					if(isFirstStep){
-						BrezenhemAlgorithm alg = new BrezenhemAlgorithm();
-						_X = alg.getXList();
-						_Y = alg.getYList();
-						
-						pixels[_Y.get(0)][_X.get(0)].setColor(Color.green);
-						pixels[_Y.get(0)][_X.get(0)].setPixel();
-						
-						cur = 1;
-						
-						isFirstStep = false;
-						drawButton.setEnabled(false);
-					}
-					else{
-						if(cur==_X.size()-1){
-							pixels[_Y.get(_Y.size()-1)][_X.get(_X.size()-1)].setColor(Color.green);
-							pixels[_Y.get(_Y.size()-1)][_X.get(_X.size()-1)].setPixel();
-							
-							EnableDrawLine(false);
-							
-							isFirstStep = true;
-							cur = 0;
-						}
-						else{
-							pixels[_Y.get(cur)][_X.get(cur)].setColor(Color.black);
-							pixels[_Y.get(cur)][_X.get(cur)].setPixel();
-						}
-						
-						cur++;
-					}					
-				}
-				if(algorithmDDA.isSelected()){
-					if(isFirstStep){
-						DDAlgorithm alg = new DDAlgorithm();
-						_X = alg.getXList();
-						_Y = alg.getYList();
-						
-						pixels[_Y.get(0)][_X.get(0)].setColor(Color.green);
-						pixels[_Y.get(0)][_X.get(0)].setPixel();
-						
-						cur = 1;
-						
-						isFirstStep = false;
-						drawButton.setEnabled(false);
-					}
-					else{
-						if(cur==_X.size()-1){
-							pixels[_Y.get(_Y.size()-1)][_X.get(_X.size()-1)].setColor(Color.green);
-							pixels[_Y.get(_Y.size()-1)][_X.get(_X.size()-1)].setPixel();
-							
-							EnableDrawLine(false);
-							
-							isFirstStep = true;
-							cur = 0;
-						}
-						else{
-							pixels[_Y.get(cur)][_X.get(cur)].setColor(Color.black);
-							pixels[_Y.get(cur)][_X.get(cur)].setPixel();
-						}
-						
-						cur++;
-					}					
-				}
+				doStep(true);
 			}
 		});
-		stepButton.setText("Step");
-		stopButton = new JButton("Stop");
+		nextStepButton.setText("Next");
+		prevStepButton = new JButton(new AbstractAction() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				doStep(false);
+			}
+		});
+		prevStepButton.setText("Prev");
 		
 		enable = false;
 		drawButton.setAction(new DrawButton());
@@ -227,17 +172,17 @@ public class Frame extends JFrame{
 		Border eastBorder = BorderFactory.createTitledBorder("Debug");
 		debugPanel.setBorder(eastBorder);
 		debugPanel.setLayout(new BoxLayout(debugPanel, BoxLayout.X_AXIS));
-		debugPanel.add(stopButton);
-		debugPanel.add(stepButton);
-		stopButton.setAlignmentX(-20);
-		stepButton.setAlignmentX(20);
+		debugPanel.add(prevStepButton);
+		debugPanel.add(nextStepButton);
+		prevStepButton.setAlignmentX(-20);
+		nextStepButton.setAlignmentX(20);
 		
 		
 		JPanel east_panel = new JPanel();
 		east_panel.setLayout(new BoxLayout(east_panel, BoxLayout.Y_AXIS));
 		east_panel.add(drawButton);		
 		drawButton.setAlignmentX(CENTER_ALIGNMENT);
-		EnableDrawLine(false);
+		EnableButtons(false);
 		east_panel.add(debugPanel, BorderLayout.NORTH);
 		
 		//clear button
@@ -396,7 +341,7 @@ public class Frame extends JFrame{
 			
 			Coordinates.isCoordinates = true;
 			
-			EnableDrawLine(false);
+			EnableButtons(false);
 		}
 	}
 	
@@ -404,9 +349,10 @@ public class Frame extends JFrame{
 		status.setText(text);
 	}
 	
-	public static void EnableDrawLine(boolean b){
+	public static void EnableButtons(boolean b){
 		drawButton.setEnabled(b);
-		stepButton.setEnabled(b);
+		nextStepButton.setEnabled(b);
+		prevStepButton.setEnabled(false);
 		enable = b;
 	}
 	
@@ -430,7 +376,7 @@ public class Frame extends JFrame{
 		pixels[Y.get(Y.size()-1)][X.get(X.size()-1)].setColor(Color.green);
 		pixels[Y.get(Y.size()-1)][X.get(X.size()-1)].setPixel();
 		
-		EnableDrawLine(false);
+		EnableButtons(false);
 		updateStatus("Select first point of line");
 	}
 	
@@ -451,7 +397,7 @@ public class Frame extends JFrame{
 		pixels[Y.get(Y.size()-1)][X.get(X.size()-1)].setColor(Color.green);
 		pixels[Y.get(Y.size()-1)][X.get(X.size()-1)].setPixel();
 		
-		EnableDrawLine(false);
+		EnableButtons(false);
 		updateStatus("Select first point of line");
 	}
 	
@@ -465,7 +411,7 @@ public class Frame extends JFrame{
 			pixels[Y.get(i)][X.get(i)].setPixel();
 		}
 		
-		EnableDrawLine(false);
+		EnableButtons(false);
 		updateStatus("Select first point of line");
 	}
 	
@@ -491,5 +437,101 @@ public class Frame extends JFrame{
 			}
 		}
 		
+	}
+	
+	private void doStep(boolean isStepNext){
+		if(algorithmBrezenhem.isSelected()){
+			if(isFirstStep){
+				BrezenhemAlgorithm alg = new BrezenhemAlgorithm();
+				_X = alg.getXList();
+				_Y = alg.getYList();
+				
+				pixels[_Y.get(0)][_X.get(0)].setColor(Color.green);
+				pixels[_Y.get(0)][_X.get(0)].setPixel();
+				
+				cur = 1;
+				
+				isFirstStep = false;
+				drawButton.setEnabled(false);
+				prevStepButton.setEnabled(true);
+			}
+			else{
+				if(cur==_X.size()-1  && isStepNext){
+					pixels[_Y.get(_Y.size()-1)][_X.get(_X.size()-1)].setColor(Color.green);
+					pixels[_Y.get(_Y.size()-1)][_X.get(_X.size()-1)].setPixel();
+					
+					EnableButtons(false);
+					
+					isFirstStep = true;
+					cur = 0;
+				}
+				else{
+					if(isStepNext){
+						pixels[_Y.get(cur)][_X.get(cur)].setColor(Color.black);
+						pixels[_Y.get(cur)][_X.get(cur)].setPixel();
+						cur++;
+					}
+					else{
+						cur--;
+						pixels[_Y.get(cur)][_X.get(cur)].clearCell();
+						if(cur==0){
+							isFirstStep = true;
+							prevStepButton.setEnabled(false);
+							drawButton.setEnabled(true);
+							pixels[_Y.get(cur)][_X.get(cur)].setColor(Color.red);
+							pixels[_Y.get(cur)][_X.get(cur)].setPixel();
+						}
+					}
+				}
+				
+			}					
+		}
+		if(algorithmDDA.isSelected()){
+			if(isFirstStep){
+				DDAlgorithm alg = new DDAlgorithm();
+				_X = alg.getXList();
+				_Y = alg.getYList();
+				
+				pixels[_Y.get(0)][_X.get(0)].setColor(Color.green);
+				pixels[_Y.get(0)][_X.get(0)].setPixel();
+				
+				cur = 1;
+				
+				isFirstStep = false;
+				drawButton.setEnabled(false);
+				prevStepButton.setEnabled(true);
+			}
+			else{
+				if(cur==_X.size()-1 && isStepNext){
+					pixels[_Y.get(_Y.size()-1)][_X.get(_X.size()-1)].setColor(Color.green);
+					pixels[_Y.get(_Y.size()-1)][_X.get(_X.size()-1)].setPixel();
+					
+					EnableButtons(false);
+					
+					isFirstStep = true;
+					cur = 0;
+					prevStepButton.setEnabled(false);
+				}
+				else{
+					if(isStepNext){
+						pixels[_Y.get(cur)][_X.get(cur)].setColor(Color.black);
+						pixels[_Y.get(cur)][_X.get(cur)].setPixel();
+						cur++;
+					}
+					else{
+						cur--;
+						pixels[_Y.get(cur)][_X.get(cur)].clearCell();
+						if(cur==0){
+							isFirstStep = true;
+							prevStepButton.setEnabled(false);
+							drawButton.setEnabled(true);
+							pixels[_Y.get(cur)][_X.get(cur)].setColor(Color.red);
+							pixels[_Y.get(cur)][_X.get(cur)].setPixel();
+						}
+					}
+				}
+				
+			}					
+		}
 	}
 }

@@ -82,7 +82,7 @@ public class Cell extends JComponent implements MouseListener{
 			    	Coordinates.y_2 = getRow();
 			    	Coordinates.isFirst = true;
 			    	Frame.updateStatus("Select Draw->Line->... and select algorithm.");
-			    	Frame.EnableDrawLine(true);
+			    	Frame.EnableButtons(true);
 			    }
 		    }
 		}
