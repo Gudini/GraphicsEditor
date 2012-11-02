@@ -23,4 +23,6 @@ public class Coordinates {
 	
 	/** Check may be you select points */
 	public static boolean isCoordinates = true;
+	
+	public static boolean isParabola = false;
 }

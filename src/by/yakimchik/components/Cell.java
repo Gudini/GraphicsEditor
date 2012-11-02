@@ -70,20 +70,28 @@ public class Cell extends JComponent implements MouseListener{
 			setColor(Color.red);
 		    repaint();
 		    
-		    if(Coordinates.isCoordinates){
-			    if(Coordinates.isFirst){
-			    	Coordinates.x_1 = getColumn();
-			    	Coordinates.y_1 = getRow();
-			    	Coordinates.isFirst = false;
-			    	Frame.updateStatus("Select second point of line");
+		    if(!Coordinates.isParabola){
+		    	if(Coordinates.isCoordinates){
+				    if(Coordinates.isFirst){
+				    	Coordinates.x_1 = getColumn();
+				    	Coordinates.y_1 = getRow();
+				    	Coordinates.isFirst = false;
+				    	Frame.updateStatus("Select second point of line");
+				    }
+				    else{
+				    	Coordinates.x_2 = getColumn();
+				    	Coordinates.y_2 = getRow();
+				    	Coordinates.isFirst = true;
+				    	Frame.updateStatus("Select Draw or Debug.");
+				    	Frame.EnableButtons(true);
+				    }
 			    }
-			    else{
-			    	Coordinates.x_2 = getColumn();
-			    	Coordinates.y_2 = getRow();
-			    	Coordinates.isFirst = true;
-			    	Frame.updateStatus("Select Draw->Line->... and select algorithm.");
-			    	Frame.EnableButtons(true);
-			    }
+		    }
+		    else{
+		    	Coordinates.x_1 = getColumn();
+		    	Coordinates.y_1 = getRow();
+		    	Frame.updateStatus("Select vertex of parabola");
+		    	Frame.EnableButtons(true);
 		    }
 		}
 	}

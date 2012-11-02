@@ -10,6 +10,9 @@ public class CircleAlgorithm {
 	private ArrayList<Integer> _Y;
 
 	public CircleAlgorithm(){
+		_X = new ArrayList<Integer>();
+		_Y = new ArrayList<Integer>();
+		
 		Coordinates.isCoordinates = false;
 		
 		int x1 = Coordinates.x_1;
@@ -17,6 +20,9 @@ public class CircleAlgorithm {
 		
 		int y1 = Coordinates.y_1;
 		int y2 = Coordinates.y_2;
+		
+		_X.add(x1);
+		_Y.add(y1);
 		
 		int radius = (int) Math.sqrt(Math.pow(x2-x1, 2)+Math.pow(y2-y1, 2));
 		
@@ -75,8 +81,10 @@ public class CircleAlgorithm {
 	}
 	
 	private void setPixel(int xCoord, int yCoord){
-		_X.add(xCoord);
-		_Y.add(yCoord);
+		if((xCoord>=0 && yCoord>=0) && (xCoord<=69 && yCoord<=69)){
+			_X.add(xCoord);
+			_Y.add(yCoord);
+		}
 	}
 	
 	private void circlePlotPoints(int xc, int yc, ScreenPt circPt){

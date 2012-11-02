@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowEvent;
@@ -43,6 +44,7 @@ public class Frame extends JFrame{
 	private static JCheckBoxMenuItem algorithmBrezenhem;
 	private static JCheckBoxMenuItem algorithmDDA;
 	private static JCheckBoxMenuItem algorithmCircle;
+	private static JCheckBoxMenuItem algorithmParabola;
 	
 	private static JButton drawButton;
 	private static JButton nextStepButton;
@@ -57,6 +59,8 @@ public class Frame extends JFrame{
 	private ArrayList<Integer> _Y;
 	
 	private static boolean enable = false;
+	
+	private static int param = 8;
 	
 	public Frame(){
 		super("Graphics Editor");
@@ -208,7 +212,7 @@ public class Frame extends JFrame{
 		JMenu draw = new JMenu("Draw");
 		JMenu lineDraw = new JMenu("Line");
 		JMenu curveDraw = new JMenu("Curve");
-		JMenu colorMenu = new JMenu("Color");
+		//JMenu colorMenu = new JMenu("Color");
 		
 		algorithmDDA = new JCheckBoxMenuItem();
 		algorithmDDA.setAction(new AbstractAction() {
@@ -221,13 +225,15 @@ public class Frame extends JFrame{
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
-				if(algorithmBrezenhem.isSelected()){
-					algorithmBrezenhem.setSelected(false);
+				if(algorithmDDA.isSelected()){
+					algorithmDDA.setSelected(false);
+				}
+				if(!algorithmDDA.isSelected()){
 					algorithmDDA.setSelected(true);
 				}
-				else{
-					algorithmDDA.setSelected(true);
-				}
+				algorithmBrezenhem.setSelected(false);
+				algorithmCircle.setSelected(false);
+				algorithmParabola.setSelected(false);
 			}
 		});
 		algorithmDDA.setText("Algorithm DDA");
@@ -241,36 +247,115 @@ public class Frame extends JFrame{
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
-				if(algorithmDDA.isSelected()){
-					algorithmDDA.setSelected(false);
+				if(algorithmBrezenhem.isSelected()){
+					algorithmBrezenhem.setSelected(false);
+				}
+				if(!algorithmBrezenhem.isSelected()){
 					algorithmBrezenhem.setSelected(true);
 				}
-				else{
-					algorithmBrezenhem.setSelected(true);
-				}
+				algorithmDDA.setSelected(false);
+				algorithmCircle.setSelected(false);
+				algorithmParabola.setSelected(false);
 			}
 		});
 		algorithmBrezenhem.setText("Algorithm Brezenhema");
 		lineDraw.add(algorithmBrezenhem);
 		
-		algorithmCircle = new JCheckBoxMenuItem();
-		curveDraw.add(algorithmCircle);
-		
-		JMenuItem selectColor = new JMenuItem("Select color");
-		selectColor.setAction(new AbstractAction() {
+		algorithmCircle = new JCheckBoxMenuItem(new AbstractAction() {
 			
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
-				
+				if(algorithmCircle.isSelected()){
+					algorithmCircle.setSelected(false);
+				}
+				if(!algorithmCircle.isSelected()){
+					algorithmCircle.setSelected(true);
+				}
+				algorithmBrezenhem.setSelected(false);
+				algorithmDDA.setSelected(false);
+				algorithmParabola.setSelected(false);
 			}
 		});
+		algorithmCircle.setText("Circle");
+		
+		algorithmParabola = new JCheckBoxMenuItem(new AbstractAction() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				if(algorithmParabola.isSelected()){
+					algorithmParabola.setSelected(false);
+				}
+				if(!algorithmParabola.isSelected()){
+					algorithmParabola.setSelected(true);
+				}
+				algorithmBrezenhem.setSelected(false);
+				algorithmDDA.setSelected(false);
+				algorithmCircle.setSelected(false);
+				
+				Coordinates.isParabola = true;
+				
+				updateStatus("Select vertex of parabola");
+				
+				final ParamFrame paramFrame = new ParamFrame(param);
+				paramFrame.addWindowListener(new WindowListener() {
+					
+					@Override
+					public void windowOpened(WindowEvent arg0) {
+						// TODO Auto-generated method stub
+						
+					}
+					
+					@Override
+					public void windowIconified(WindowEvent arg0) {
+						// TODO Auto-generated method stub
+						
+					}
+					
+					@Override
+					public void windowDeiconified(WindowEvent arg0) {
+						// TODO Auto-generated method stub
+						
+					}
+					
+					@Override
+					public void windowDeactivated(WindowEvent arg0) {
+						// TODO Auto-generated method stub
+						
+					}
+					
+					@Override
+					public void windowClosing(WindowEvent arg0) {
+						// TODO Auto-generated method stub
+						
+					}
+					
+					@Override
+					public void windowClosed(WindowEvent arg0) {
+						// TODO Auto-generated method stub
+						if(paramFrame.isOkButtonClick()){
+							param = Integer.parseInt(paramFrame.getParam());
+						}
+					}
+					
+					@Override
+					public void windowActivated(WindowEvent arg0) {
+						// TODO Auto-generated method stub
+						
+					}
+				});
+			}
+		});
+		algorithmParabola.setText("Parabola");
+		
+		curveDraw.add(algorithmCircle);
+		curveDraw.add(algorithmParabola);
 		
 		//EnableDrawLine(false);
 		
 		draw.add(lineDraw);
-		//draw.add(curveDraw);
-		//sdraw.add(colorMenu);
+		draw.add(curveDraw);
 		
 		return draw;
 	}
@@ -411,6 +496,9 @@ public class Frame extends JFrame{
 			pixels[Y.get(i)][X.get(i)].setPixel();
 		}
 		
+		pixels[Y.get(0)][X.get(0)].setColor(Color.green);
+		pixels[Y.get(0)][X.get(0)].setPixel();
+		
 		EnableButtons(false);
 		updateStatus("Select first point of line");
 	}
@@ -434,6 +522,13 @@ public class Frame extends JFrame{
 			}
 			if(algorithmDDA.isSelected()){
 				DrawLineDDAAlgorithm();
+			}
+			if(algorithmCircle.isSelected()){
+				DrawCircleAlgorithm();
+			}
+			if(algorithmParabola.isSelected()){
+				DrawParabolAlgorithm();
+				EnableButtons(false);
 			}
 		}
 		
@@ -533,5 +628,65 @@ public class Frame extends JFrame{
 				
 			}					
 		}
+		if(algorithmCircle.isSelected()){
+			if(isFirstStep){
+				CircleAlgorithm alg = new CircleAlgorithm();
+				_X = alg.getXList();
+				_Y = alg.getYList();
+				
+				pixels[_Y.get(0)][_X.get(0)].setColor(Color.green);
+				pixels[_Y.get(0)][_X.get(0)].setPixel();
+				
+				cur = 1;
+				
+				isFirstStep = false;
+				drawButton.setEnabled(false);
+				prevStepButton.setEnabled(true);
+			}
+			else{
+				if(cur==_X.size()-4  && isStepNext){					
+					EnableButtons(false);
+					
+					isFirstStep = true;
+					cur = 0;
+				}
+				else{
+					if(isStepNext){
+						pixels[_Y.get(cur)][_X.get(cur)].setColor(Color.black);
+						pixels[_Y.get(cur)][_X.get(cur)].setPixel();
+						cur++;
+					}
+					else{
+						cur--;
+						pixels[_Y.get(cur)][_X.get(cur)].clearCell();
+						if(cur==0){
+							isFirstStep = true;
+							prevStepButton.setEnabled(false);
+							drawButton.setEnabled(true);
+							pixels[_Y.get(cur)][_X.get(cur)].setColor(Color.red);
+							pixels[_Y.get(cur)][_X.get(cur)].setPixel();
+						}
+					}
+				}
+				
+			}
+		}
+	}
+	
+	private void DrawParabolAlgorithm(){
+		ParabolaAlgorithm p = new ParabolaAlgorithm(param);
+		_X = p.getXList();
+		_Y = p.getYList();
+		
+		for(int i=0; i<_X.size(); i++){
+			pixels[_Y.get(i)][_X.get(i)].setColor(Color.black);
+			pixels[_Y.get(i)][_X.get(i)].setPixel();
+		}
+		
+		pixels[_Y.get(0)][_X.get(0)].setColor(Color.green);
+		pixels[_Y.get(0)][_X.get(0)].setPixel();
+		
+		pixels[_Y.get(_Y.size()-1)][_X.get(_X.size()-1)].setColor(Color.green);
+		pixels[_Y.get(_Y.size()-1)][_X.get(_X.size()-1)].setPixel();
 	}
 }
