@@ -26,15 +26,15 @@ public class ParamFrame extends JFrame{
 	
 	private Container content;
 
-	public ParamFrame(int _param){
-		super("Enter parametr");
+	public ParamFrame(String title, String textLabel, int _param){
+		super(title);
 		
 		content = getContentPane();
 		
 		JPanel p = new JPanel();
 		p.setLayout(new GridLayout(2,2));
 		
-		JLabel paramLabel = new JLabel("p: ");
+		JLabel paramLabel = new JLabel(textLabel);
 		final JTextField paramField = new JTextField();
 		paramField.setText(_param+"");
 		

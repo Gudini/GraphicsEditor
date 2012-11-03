@@ -45,6 +45,7 @@ public class Frame extends JFrame{
 	private static JCheckBoxMenuItem algorithmDDA;
 	private static JCheckBoxMenuItem algorithmCircle;
 	private static JCheckBoxMenuItem algorithmParabola;
+	private static JCheckBoxMenuItem algorithmBeze;
 	
 	private static JButton drawButton;
 	private static JButton nextStepButton;
@@ -60,7 +61,8 @@ public class Frame extends JFrame{
 	
 	private static boolean enable = false;
 	
-	private static int param = 8;
+	private static int paramParabola = 8;
+	private static int paramBeze = 50;
 	
 	public Frame(){
 		super("Graphics Editor");
@@ -150,6 +152,8 @@ public class Frame extends JFrame{
 		isFirstStep = true;
 		
 		drawButton = new JButton("Draw");
+		drawButton.setAction(new DrawButton());
+		
 		nextStepButton = new JButton(new AbstractAction() {
 			
 			@Override
@@ -170,7 +174,6 @@ public class Frame extends JFrame{
 		prevStepButton.setText("Prev");
 		
 		enable = false;
-		drawButton.setAction(new DrawButton());
 		
 		JPanel debugPanel = new JPanel();
 		Border eastBorder = BorderFactory.createTitledBorder("Debug");
@@ -211,6 +214,7 @@ public class Frame extends JFrame{
 	private JMenu createDrawMenu(){
 		JMenu draw = new JMenu("Draw");
 		JMenu lineDraw = new JMenu("Line");
+		JMenu conicDraw = new JMenu("Conic");
 		JMenu curveDraw = new JMenu("Curve");
 		//JMenu colorMenu = new JMenu("Color");
 		
@@ -234,6 +238,9 @@ public class Frame extends JFrame{
 				algorithmBrezenhem.setSelected(false);
 				algorithmCircle.setSelected(false);
 				algorithmParabola.setSelected(false);
+				algorithmBeze.setSelected(false);
+				
+				Coordinates.numberOfAlgorithm = 1;
 			}
 		});
 		algorithmDDA.setText("Algorithm DDA");
@@ -256,6 +263,9 @@ public class Frame extends JFrame{
 				algorithmDDA.setSelected(false);
 				algorithmCircle.setSelected(false);
 				algorithmParabola.setSelected(false);
+				algorithmBeze.setSelected(false);
+				
+				Coordinates.numberOfAlgorithm = 1;
 			}
 		});
 		algorithmBrezenhem.setText("Algorithm Brezenhema");
@@ -275,6 +285,9 @@ public class Frame extends JFrame{
 				algorithmBrezenhem.setSelected(false);
 				algorithmDDA.setSelected(false);
 				algorithmParabola.setSelected(false);
+				algorithmBeze.setSelected(false);
+				
+				Coordinates.numberOfAlgorithm = 1;
 			}
 		});
 		algorithmCircle.setText("Circle");
@@ -293,12 +306,13 @@ public class Frame extends JFrame{
 				algorithmBrezenhem.setSelected(false);
 				algorithmDDA.setSelected(false);
 				algorithmCircle.setSelected(false);
+				algorithmBeze.setSelected(false);
 				
-				Coordinates.isParabola = true;
+				Coordinates.numberOfAlgorithm = 2;
 				
 				updateStatus("Select vertex of parabola");
 				
-				final ParamFrame paramFrame = new ParamFrame(param);
+				final ParamFrame paramFrame = new ParamFrame("Enter parametr", "p:", paramParabola);
 				paramFrame.addWindowListener(new WindowListener() {
 					
 					@Override
@@ -335,7 +349,7 @@ public class Frame extends JFrame{
 					public void windowClosed(WindowEvent arg0) {
 						// TODO Auto-generated method stub
 						if(paramFrame.isOkButtonClick()){
-							param = Integer.parseInt(paramFrame.getParam());
+							paramParabola = Integer.parseInt(paramFrame.getParam());
 						}
 					}
 					
@@ -349,12 +363,84 @@ public class Frame extends JFrame{
 		});
 		algorithmParabola.setText("Parabola");
 		
-		curveDraw.add(algorithmCircle);
-		curveDraw.add(algorithmParabola);
+		algorithmBeze = new JCheckBoxMenuItem(new AbstractAction() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				if(algorithmBeze.isSelected()){
+					algorithmBeze.setSelected(false);
+				}
+				if(!algorithmBeze.isSelected()){
+					algorithmBeze.setSelected(true);
+				}
+				algorithmBrezenhem.setSelected(false);
+				algorithmDDA.setSelected(false);
+				algorithmCircle.setSelected(false);
+				algorithmParabola.setSelected(false);
+				
+				Coordinates.numberOfAlgorithm = 3;
+				
+				final ParamFrame paramFrame = new ParamFrame("Enter correctness", "N:", paramBeze);
+				paramFrame.addWindowListener(new WindowListener() {
+					
+					@Override
+					public void windowOpened(WindowEvent arg0) {
+						// TODO Auto-generated method stub
+						
+					}
+					
+					@Override
+					public void windowIconified(WindowEvent arg0) {
+						// TODO Auto-generated method stub
+						
+					}
+					
+					@Override
+					public void windowDeiconified(WindowEvent arg0) {
+						// TODO Auto-generated method stub
+						
+					}
+					
+					@Override
+					public void windowDeactivated(WindowEvent arg0) {
+						// TODO Auto-generated method stub
+						
+					}
+					
+					@Override
+					public void windowClosing(WindowEvent arg0) {
+						// TODO Auto-generated method stub
+						
+					}
+					
+					@Override
+					public void windowClosed(WindowEvent arg0) {
+						// TODO Auto-generated method stub
+						if(paramFrame.isOkButtonClick()){
+							paramBeze = Integer.parseInt(paramFrame.getParam());
+						}
+					}
+					
+					@Override
+					public void windowActivated(WindowEvent arg0) {
+						// TODO Auto-generated method stub
+						
+					}
+				});
+			}
+		});
+		algorithmBeze.setText("Algorithm Bezier");
+		
+		conicDraw.add(algorithmCircle);
+		conicDraw.add(algorithmParabola);
+		
+		curveDraw.add(algorithmBeze);
 		
 		//EnableDrawLine(false);
 		
 		draw.add(lineDraw);
+		draw.add(conicDraw);
 		draw.add(curveDraw);
 		
 		return draw;
@@ -530,6 +616,10 @@ public class Frame extends JFrame{
 				DrawParabolAlgorithm();
 				EnableButtons(false);
 			}
+			if(algorithmBeze.isSelected()){
+				DrawBezeAlgorithm();
+				EnableButtons(false);
+			}
 		}
 		
 	}
@@ -674,9 +764,27 @@ public class Frame extends JFrame{
 	}
 	
 	private void DrawParabolAlgorithm(){
-		ParabolaAlgorithm p = new ParabolaAlgorithm(param);
+		ParabolaAlgorithm p = new ParabolaAlgorithm(paramParabola);
 		_X = p.getXList();
 		_Y = p.getYList();
+		
+		for(int i=0; i<_X.size(); i++){
+			pixels[_Y.get(i)][_X.get(i)].setColor(Color.black);
+			pixels[_Y.get(i)][_X.get(i)].setPixel();
+		}
+		
+		pixels[_Y.get(0)][_X.get(0)].setColor(Color.green);
+		pixels[_Y.get(0)][_X.get(0)].setPixel();
+		
+		pixels[_Y.get(_Y.size()-1)][_X.get(_X.size()-1)].setColor(Color.green);
+		pixels[_Y.get(_Y.size()-1)][_X.get(_X.size()-1)].setPixel();
+	}
+	
+	private void DrawBezeAlgorithm(){
+		BezeAlgotithm b = new BezeAlgotithm(paramBeze);
+		
+		_X = b.getXList();
+		_Y = b.getYList();
 		
 		for(int i=0; i<_X.size(); i++){
 			pixels[_Y.get(i)][_X.get(i)].setColor(Color.black);

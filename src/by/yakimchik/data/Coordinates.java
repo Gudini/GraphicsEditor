@@ -19,10 +19,19 @@ public class Coordinates {
 	public static int y_2 = 0;
 	
 	/** Check is select first point */
-	public static boolean isFirst = true;
+	public static boolean isFirstClick = true;
+	
+	public static int numberOfClick = 1;
 	
 	/** Check may be you select points */
 	public static boolean isCoordinates = true;
 	
-	public static boolean isParabola = false;
+	/** Points for beze algorithm */
+	public static int x_3 = 0;
+	public static int y_3 = 0;
+	
+	public static int x_4 = 0;
+	public static int y_4 = 0;
+	
+	public static int numberOfAlgorithm = 1;
 }

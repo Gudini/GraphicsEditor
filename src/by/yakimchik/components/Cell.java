@@ -70,29 +70,73 @@ public class Cell extends JComponent implements MouseListener{
 			setColor(Color.red);
 		    repaint();
 		    
-		    if(!Coordinates.isParabola){
+		    int num = Coordinates.numberOfAlgorithm;
+		    
+		    switch (num){
+		    case 1:{
 		    	if(Coordinates.isCoordinates){
-				    if(Coordinates.isFirst){
+				    if(Coordinates.isFirstClick){
 				    	Coordinates.x_1 = getColumn();
 				    	Coordinates.y_1 = getRow();
-				    	Coordinates.isFirst = false;
+				    	Coordinates.isFirstClick = false;
 				    	Frame.updateStatus("Select second point of line");
 				    }
 				    else{
 				    	Coordinates.x_2 = getColumn();
 				    	Coordinates.y_2 = getRow();
-				    	Coordinates.isFirst = true;
+				    	Coordinates.isFirstClick = true;
 				    	Frame.updateStatus("Select Draw or Debug.");
 				    	Frame.EnableButtons(true);
 				    }
 			    }
+		    	break;
 		    }
-		    else{
+		    case 2:{
 		    	Coordinates.x_1 = getColumn();
 		    	Coordinates.y_1 = getRow();
 		    	Frame.updateStatus("Select vertex of parabola");
 		    	Frame.EnableButtons(true);
+		    	break;
 		    }
+		    
+		    case 3:{
+		    	
+		    	switch (Coordinates.numberOfClick) {
+				case 1:
+					Coordinates.x_1 = getColumn();
+			    	Coordinates.y_1 = getRow();
+			    	Coordinates.numberOfClick = 2;
+			    	Frame.updateStatus("Select second point of line");
+					break;
+
+				case 2:
+					Coordinates.x_2 = getColumn();
+			    	Coordinates.y_2 = getRow();
+			    	Coordinates.numberOfClick = 3;
+			    	Frame.updateStatus("Select thrid point of line");
+					break;
+					
+				case 3:
+					Coordinates.x_3 = getColumn();
+			    	Coordinates.y_3 = getRow();
+			    	Coordinates.numberOfClick = 4;
+			    	Frame.updateStatus("Select fourth point of line");
+					break;
+					
+				case 4:
+					Coordinates.x_4 = getColumn();
+			    	Coordinates.y_4 = getRow();
+			    	Frame.updateStatus("Select Draw or Debug");
+			    	Coordinates.numberOfClick = 1;
+			    	Frame.EnableButtons(true);
+					break;
+				}
+		    		
+		    	break;
+		    }
+		    
+		    }
+		    
 		}
 	}
 
