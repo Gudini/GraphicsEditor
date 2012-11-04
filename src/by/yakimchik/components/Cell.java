@@ -135,6 +135,21 @@ public class Cell extends JComponent implements MouseListener{
 		    	break;
 		    }
 		    
+		    case 4:{
+		    	if(Coordinates.countPointsOfSegment>0){
+		    		Coordinates.xSegment.add(getColumn());
+		    		Coordinates.ySegment.add(getRow());
+		    		Frame.updateStatus("Select "+Coordinates.countPointsOfSegment+" point");
+		    		Coordinates.countPointsOfSegment--;
+		    		if(Coordinates.countPointsOfSegment==0){
+		    			Coordinates.countPointsOfSegment = -1;
+		    			Frame.EnableButtons(true);
+		    			Frame.updateStatus("Select Draw or Debug");
+		    		}
+		    	}
+		    	break;
+		    }
+		    
 		    }
 		    
 		}

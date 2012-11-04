@@ -33,13 +33,14 @@ public class BezeAlgotithm {
 			x = (int) Math.round((Math.pow(1-t, 3)*P1x+3*t*Math.pow(t-1, 2)*P2x+3*Math.pow(t, 2)*(1-t)*P3x+Math.pow(t, 3)*P4x));
 			y = (int) Math.round((Math.pow(1-t, 3)*P1y+3*t*Math.pow(t-1, 2)*P2y+3*Math.pow(t, 2)*(1-t)*P3y+Math.pow(t, 3)*P4y));
 			
-			_X.add(x);
-			_Y.add(y);
+			if(checkDuplicate(x,y)){
+				_X.add(x);
+				_Y.add(y);
+			}
 		}
 		
 		_X.add(P4x);
-		_Y.add(P4y);
-		
+		_Y.add(P4y);		
 		
 		Coordinates.isCoordinates = true;
 	}
@@ -50,6 +51,17 @@ public class BezeAlgotithm {
 	
 	public ArrayList<Integer> getYList(){
 		return _Y;
+	}
+	
+	private boolean checkDuplicate(int vx, int vy){
+		for(int i=0; i<_X.size(); i++){
+			if(_X.get(i)==vx){
+				if(_Y.get(i)==vy){
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 
 }

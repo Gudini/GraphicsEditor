@@ -24,19 +24,31 @@ public class ParamFrame extends JFrame{
 
 	private String param;
 	
+	private String count;
+	
 	private Container content;
 
-	public ParamFrame(String title, String textLabel, int _param){
+	public ParamFrame(String title, String textLabel, int _param, int _count, final boolean isSpline){
 		super(title);
 		
 		content = getContentPane();
-		
 		JPanel p = new JPanel();
-		p.setLayout(new GridLayout(2,2));
-		
 		JLabel paramLabel = new JLabel(textLabel);
 		final JTextField paramField = new JTextField();
 		paramField.setText(_param+"");
+		
+		JLabel countPoints = new JLabel("Points:");
+		final JTextField countField = new JTextField();
+		countField.setText(_count+"");
+		
+		if(!isSpline){
+			p.setLayout(new GridLayout(2,2));		
+			setSize(230, 90);
+		}
+		else{
+			p.setLayout(new GridLayout(3,2));
+			setSize(230, 110);
+		}
 		
 		JButton okButton = new JButton(new AbstractAction() {
 			
@@ -49,11 +61,25 @@ public class ParamFrame extends JFrame{
 			public void actionPerformed(ActionEvent event) {
 				// TODO Auto-generated method stub
 				param = paramField.getText();
+				count = countField.getText();
 				try{
 					Integer.parseInt(param);
-					dispose();
-					setVisible(false);
-					setOkButtonClick(true);
+					if(isSpline){
+						int k = Integer.parseInt(count);
+						if(k<4){
+							JOptionPane.showMessageDialog(getWindows()[1], "Please, input number more or equals.", "Input error",JOptionPane.ERROR_MESSAGE);
+						}
+						else{
+							dispose();
+							setVisible(false);
+							setOkButtonClick(true);
+						}
+					}
+					else{
+						dispose();
+						setVisible(false);
+						setOkButtonClick(true);
+					}
 				}
 				catch (NumberFormatException e) {
 					// TODO: handle exception
@@ -82,6 +108,12 @@ public class ParamFrame extends JFrame{
 		
 		p.add(paramLabel);
 		p.add(paramField);
+		
+		if(isSpline){
+			p.add(countPoints);
+			p.add(countField);
+		}
+		
 		p.add(okButton);
 		p.add(cancelButton);
 		
@@ -98,7 +130,6 @@ public class ParamFrame extends JFrame{
 		
 		setLocation(x, y);
 		
-		setSize(230, 90);
 		setVisible(true);
 	}
 
@@ -112,5 +143,14 @@ public class ParamFrame extends JFrame{
 	
 	public String getParam(){
 		return param;
+	}
+	
+	public String getCount(boolean isSpline){
+		if(isSpline){
+			return count;
+		}
+		else{
+			return null;
+		}
 	}
 }

@@ -5,7 +5,6 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridLayout;
-import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowEvent;
@@ -46,6 +45,7 @@ public class Frame extends JFrame{
 	private static JCheckBoxMenuItem algorithmCircle;
 	private static JCheckBoxMenuItem algorithmParabola;
 	private static JCheckBoxMenuItem algorithmBeze;
+	private static JCheckBoxMenuItem algorithmBSpline;
 	
 	private static JButton drawButton;
 	private static JButton nextStepButton;
@@ -63,6 +63,8 @@ public class Frame extends JFrame{
 	
 	private static int paramParabola = 8;
 	private static int paramBeze = 50;
+	private static int paramSpline = 50;
+	private static int paramCountPoints = 4;
 	
 	public Frame(){
 		super("Graphics Editor");
@@ -239,6 +241,7 @@ public class Frame extends JFrame{
 				algorithmCircle.setSelected(false);
 				algorithmParabola.setSelected(false);
 				algorithmBeze.setSelected(false);
+				algorithmBSpline.setSelected(false);
 				
 				Coordinates.numberOfAlgorithm = 1;
 			}
@@ -264,6 +267,7 @@ public class Frame extends JFrame{
 				algorithmCircle.setSelected(false);
 				algorithmParabola.setSelected(false);
 				algorithmBeze.setSelected(false);
+				algorithmBSpline.setSelected(false);
 				
 				Coordinates.numberOfAlgorithm = 1;
 			}
@@ -286,6 +290,7 @@ public class Frame extends JFrame{
 				algorithmDDA.setSelected(false);
 				algorithmParabola.setSelected(false);
 				algorithmBeze.setSelected(false);
+				algorithmBSpline.setSelected(false);
 				
 				Coordinates.numberOfAlgorithm = 1;
 			}
@@ -307,12 +312,13 @@ public class Frame extends JFrame{
 				algorithmDDA.setSelected(false);
 				algorithmCircle.setSelected(false);
 				algorithmBeze.setSelected(false);
+				algorithmBSpline.setSelected(false);
 				
 				Coordinates.numberOfAlgorithm = 2;
 				
 				updateStatus("Select vertex of parabola");
 				
-				final ParamFrame paramFrame = new ParamFrame("Enter parametr", "p:", paramParabola);
+				final ParamFrame paramFrame = new ParamFrame("Enter parametr", "p:", paramParabola, 0,false);
 				paramFrame.addWindowListener(new WindowListener() {
 					
 					@Override
@@ -378,10 +384,11 @@ public class Frame extends JFrame{
 				algorithmDDA.setSelected(false);
 				algorithmCircle.setSelected(false);
 				algorithmParabola.setSelected(false);
+				algorithmBSpline.setSelected(false);
 				
 				Coordinates.numberOfAlgorithm = 3;
 				
-				final ParamFrame paramFrame = new ParamFrame("Enter correctness", "N:", paramBeze);
+				final ParamFrame paramFrame = new ParamFrame("Enter correctness", "N:", paramBeze, 0,false);
 				paramFrame.addWindowListener(new WindowListener() {
 					
 					@Override
@@ -432,10 +439,83 @@ public class Frame extends JFrame{
 		});
 		algorithmBeze.setText("Algorithm Bezier");
 		
+		algorithmBSpline = new JCheckBoxMenuItem(new AbstractAction() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				if(algorithmBSpline.isSelected()){
+					algorithmBSpline.setSelected(false);
+				}
+				if(!algorithmBSpline.isSelected()){
+					algorithmBSpline.setSelected(true);
+				}
+				algorithmBrezenhem.setSelected(false);
+				algorithmDDA.setSelected(false);
+				algorithmCircle.setSelected(false);
+				algorithmParabola.setSelected(false);
+				algorithmBeze.setSelected(false);
+				
+				Coordinates.numberOfAlgorithm = 4;
+				
+				final ParamFrame paramFrame = new ParamFrame("Enter correctness", "N:", paramSpline, paramCountPoints,true);
+				paramFrame.addWindowListener(new WindowListener() {
+					
+					@Override
+					public void windowOpened(WindowEvent arg0) {
+						// TODO Auto-generated method stub
+						
+					}
+					
+					@Override
+					public void windowIconified(WindowEvent arg0) {
+						// TODO Auto-generated method stub
+						
+					}
+					
+					@Override
+					public void windowDeiconified(WindowEvent arg0) {
+						// TODO Auto-generated method stub
+						
+					}
+					
+					@Override
+					public void windowDeactivated(WindowEvent arg0) {
+						// TODO Auto-generated method stub
+						
+					}
+					
+					@Override
+					public void windowClosing(WindowEvent arg0) {
+						// TODO Auto-generated method stub
+						
+					}
+					
+					@Override
+					public void windowClosed(WindowEvent arg0) {
+						// TODO Auto-generated method stub
+						if(paramFrame.isOkButtonClick()){
+							paramSpline = Integer.parseInt(paramFrame.getParam());
+							paramCountPoints = Integer.parseInt(paramFrame.getCount(true));
+							Coordinates.countPointsOfSegment = paramCountPoints;
+						}
+					}
+					
+					@Override
+					public void windowActivated(WindowEvent arg0) {
+						// TODO Auto-generated method stub
+						
+					}
+				});
+			}
+		});
+		algorithmBSpline.setText("B-spline");
+		
 		conicDraw.add(algorithmCircle);
 		conicDraw.add(algorithmParabola);
 		
 		curveDraw.add(algorithmBeze);
+		curveDraw.add(algorithmBSpline);
 		
 		//EnableDrawLine(false);
 		
@@ -620,6 +700,11 @@ public class Frame extends JFrame{
 				DrawBezeAlgorithm();
 				EnableButtons(false);
 			}
+			if(algorithmBSpline.isSelected()){
+				DrawSplineAlgorithm();
+				EnableButtons(false);
+				Coordinates.countPointsOfSegment = paramCountPoints;
+			}
 		}
 		
 	}
@@ -761,6 +846,99 @@ public class Frame extends JFrame{
 				
 			}
 		}
+		if(algorithmBeze.isSelected()){
+			if(isFirstStep){
+				BezeAlgotithm alg = new BezeAlgotithm(paramBeze);
+				_X = alg.getXList();
+				_Y = alg.getYList();
+				
+				pixels[_Y.get(0)][_X.get(0)].setColor(Color.green);
+				pixels[_Y.get(0)][_X.get(0)].setPixel();
+				
+				cur = 1;
+				
+				isFirstStep = false;
+				drawButton.setEnabled(false);
+				prevStepButton.setEnabled(true);
+			}
+			else{
+				if(cur==_X.size()-1  && isStepNext){					
+					EnableButtons(false);
+					
+					pixels[_Y.get(_Y.size()-1)][_X.get(_X.size()-1)].setColor(Color.green);
+					pixels[_Y.get(_Y.size()-1)][_X.get(_X.size()-1)].setPixel();
+					
+					isFirstStep = true;
+					cur = 0;
+				}
+				else{
+					if(isStepNext){
+						pixels[_Y.get(cur)][_X.get(cur)].setColor(Color.black);
+						pixels[_Y.get(cur)][_X.get(cur)].setPixel();
+						cur++;
+					}
+					else{
+						cur--;
+						pixels[_Y.get(cur)][_X.get(cur)].clearCell();
+						if(cur==0){
+							isFirstStep = true;
+							prevStepButton.setEnabled(false);
+							drawButton.setEnabled(true);
+							pixels[_Y.get(cur)][_X.get(cur)].setColor(Color.red);
+							pixels[_Y.get(cur)][_X.get(cur)].setPixel();
+						}
+					}
+				}
+				
+			}
+		}
+		
+		if(algorithmBSpline.isSelected()){
+			if(isFirstStep){
+				BSplainAlgorithm alg = new BSplainAlgorithm(paramSpline);
+				_X = alg.getXList();
+				_Y = alg.getYList();
+				
+				pixels[_Y.get(0)][_X.get(0)].setColor(Color.green);
+				pixels[_Y.get(0)][_X.get(0)].setPixel();
+				
+				cur = 1;
+				
+				isFirstStep = false;
+				drawButton.setEnabled(false);
+				prevStepButton.setEnabled(true);
+			}
+			else{
+				if(cur==_X.size()-1  && isStepNext){					
+					EnableButtons(false);
+					
+					pixels[_Y.get(_Y.size()-1)][_X.get(_X.size()-1)].setColor(Color.green);
+					pixels[_Y.get(_Y.size()-1)][_X.get(_X.size()-1)].setPixel();
+					
+					isFirstStep = true;
+					cur = 0;
+				}
+				else{
+					if(isStepNext){
+						pixels[_Y.get(cur)][_X.get(cur)].setColor(Color.black);
+						pixels[_Y.get(cur)][_X.get(cur)].setPixel();
+						cur++;
+					}
+					else{
+						cur--;
+						pixels[_Y.get(cur)][_X.get(cur)].clearCell();
+						if(cur==0){
+							isFirstStep = true;
+							prevStepButton.setEnabled(false);
+							drawButton.setEnabled(true);
+							pixels[_Y.get(cur)][_X.get(cur)].setColor(Color.red);
+							pixels[_Y.get(cur)][_X.get(cur)].setPixel();
+						}
+					}
+				}
+				
+			}
+		}
 	}
 	
 	private void DrawParabolAlgorithm(){
@@ -785,6 +963,24 @@ public class Frame extends JFrame{
 		
 		_X = b.getXList();
 		_Y = b.getYList();
+		
+		for(int i=0; i<_X.size(); i++){
+			pixels[_Y.get(i)][_X.get(i)].setColor(Color.black);
+			pixels[_Y.get(i)][_X.get(i)].setPixel();
+		}
+		
+		pixels[_Y.get(0)][_X.get(0)].setColor(Color.green);
+		pixels[_Y.get(0)][_X.get(0)].setPixel();
+		
+		pixels[_Y.get(_Y.size()-1)][_X.get(_X.size()-1)].setColor(Color.green);
+		pixels[_Y.get(_Y.size()-1)][_X.get(_X.size()-1)].setPixel();
+	}
+	
+	private void DrawSplineAlgorithm(){
+		BSplainAlgorithm bs = new BSplainAlgorithm(paramSpline);
+		
+		_X = bs.getXList();
+		_Y = bs.getYList();
 		
 		for(int i=0; i<_X.size(); i++){
 			pixels[_Y.get(i)][_X.get(i)].setColor(Color.black);
