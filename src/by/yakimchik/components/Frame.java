@@ -47,7 +47,12 @@ public class Frame extends JFrame{
 	private static JCheckBoxMenuItem algorithmBeze;
 	private static JCheckBoxMenuItem algorithmBSpline;
 	
+	/** Menu of Fill menu */
+	private static JCheckBoxMenuItem algorithmZatravki;
+	private static JCheckBoxMenuItem algorithmScan;
+	
 	private static JButton drawButton;
+	public static JButton fillButton;
 	private static JButton nextStepButton;
 	private static JButton prevStepButton;
 	
@@ -74,6 +79,7 @@ public class Frame extends JFrame{
 		
 		menuBar.add(createFileMenu());
 		menuBar.add(createDrawMenu());
+		menuBar.add(createFillMenu());
 		menuBar.add(createWindowMenu());
 		
 		status = new JLabel("Select first point of line");
@@ -156,6 +162,11 @@ public class Frame extends JFrame{
 		drawButton = new JButton("Draw");
 		drawButton.setAction(new DrawButton());
 		
+		fillButton = new JButton("Fill");
+		fillButton.setAction(new FillButton());
+		fillButton.setEnabled(false);
+		
+		
 		nextStepButton = new JButton(new AbstractAction() {
 			
 			@Override
@@ -190,7 +201,9 @@ public class Frame extends JFrame{
 		JPanel east_panel = new JPanel();
 		east_panel.setLayout(new BoxLayout(east_panel, BoxLayout.Y_AXIS));
 		east_panel.add(drawButton);		
+		east_panel.add(fillButton);
 		drawButton.setAlignmentX(CENTER_ALIGNMENT);
+		fillButton.setAlignmentX(CENTER_ALIGNMENT);
 		EnableButtons(false);
 		east_panel.add(debugPanel, BorderLayout.NORTH);
 		
@@ -242,6 +255,8 @@ public class Frame extends JFrame{
 				algorithmParabola.setSelected(false);
 				algorithmBeze.setSelected(false);
 				algorithmBSpline.setSelected(false);
+				algorithmZatravki.setSelected(false);
+				algorithmScan.setSelected(false);
 				
 				Coordinates.numberOfAlgorithm = 1;
 			}
@@ -268,6 +283,10 @@ public class Frame extends JFrame{
 				algorithmParabola.setSelected(false);
 				algorithmBeze.setSelected(false);
 				algorithmBSpline.setSelected(false);
+				algorithmZatravki.setSelected(false);
+				algorithmScan.setSelected(false);
+				
+				fillButton.setEnabled(false);
 				
 				Coordinates.numberOfAlgorithm = 1;
 			}
@@ -291,6 +310,10 @@ public class Frame extends JFrame{
 				algorithmParabola.setSelected(false);
 				algorithmBeze.setSelected(false);
 				algorithmBSpline.setSelected(false);
+				algorithmZatravki.setSelected(false);
+				algorithmScan.setSelected(false);
+				
+				fillButton.setEnabled(false);
 				
 				Coordinates.numberOfAlgorithm = 1;
 			}
@@ -313,6 +336,10 @@ public class Frame extends JFrame{
 				algorithmCircle.setSelected(false);
 				algorithmBeze.setSelected(false);
 				algorithmBSpline.setSelected(false);
+				algorithmZatravki.setSelected(false);
+				algorithmScan.setSelected(false);
+				
+				fillButton.setEnabled(false);
 				
 				Coordinates.numberOfAlgorithm = 2;
 				
@@ -385,6 +412,10 @@ public class Frame extends JFrame{
 				algorithmCircle.setSelected(false);
 				algorithmParabola.setSelected(false);
 				algorithmBSpline.setSelected(false);
+				algorithmZatravki.setSelected(false);
+				algorithmScan.setSelected(false);
+				
+				fillButton.setEnabled(false);
 				
 				Coordinates.numberOfAlgorithm = 3;
 				
@@ -455,6 +486,10 @@ public class Frame extends JFrame{
 				algorithmCircle.setSelected(false);
 				algorithmParabola.setSelected(false);
 				algorithmBeze.setSelected(false);
+				algorithmZatravki.setSelected(false);
+				algorithmScan.setSelected(false);
+				
+				fillButton.setEnabled(false);
 				
 				Coordinates.numberOfAlgorithm = 4;
 				
@@ -532,6 +567,63 @@ public class Frame extends JFrame{
 		window.add(clearItem);
 		
 		return window;
+	}
+	
+	private JMenu createFillMenu(){
+		JMenu fill = new JMenu("Fill");
+		
+		algorithmZatravki = new JCheckBoxMenuItem(new AbstractAction() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				if(algorithmZatravki.isSelected()){
+					algorithmZatravki.setSelected(false);
+				}
+				if(!algorithmZatravki.isSelected()){
+					algorithmZatravki.setSelected(true);
+				}
+				algorithmScan.setSelected(false);
+				algorithmBrezenhem.setSelected(false);
+				algorithmDDA.setSelected(false);
+				algorithmCircle.setSelected(false);
+				algorithmParabola.setSelected(false);
+				algorithmBeze.setSelected(false);
+				algorithmBSpline.setSelected(false);
+				
+				Coordinates.numberOfAlgorithm = 5;
+			}
+		});
+		algorithmZatravki.setText("Zatravka");		
+		
+		algorithmScan = new JCheckBoxMenuItem(new AbstractAction() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				if(algorithmScan.isSelected()){
+					algorithmScan.setSelected(false);
+				}
+				if(!algorithmScan.isSelected()){
+					algorithmScan.setSelected(true);
+				}
+				algorithmZatravki.setSelected(false);
+				algorithmBrezenhem.setSelected(false);
+				algorithmDDA.setSelected(false);
+				algorithmCircle.setSelected(false);
+				algorithmParabola.setSelected(false);
+				algorithmBeze.setSelected(false);
+				algorithmBSpline.setSelected(false);
+				
+				Coordinates.numberOfAlgorithm = 5;
+			}
+		});
+		algorithmScan.setText("Scanning");
+		
+		fill.add(algorithmZatravki);
+		fill.add(algorithmScan);
+		
+		return fill;
 	}
 		
 	private JPanel creatPanelCells(){
@@ -939,6 +1031,52 @@ public class Frame extends JFrame{
 				
 			}
 		}
+		if(algorithmZatravki.isSelected()){
+			if(isFirstStep){
+				ZatravkaAlgorithm alg = new ZatravkaAlgorithm(pixels);
+				_X = alg.getXList();
+				_Y = alg.getYList();
+				
+				pixels[_X.get(0)][_Y.get(0)].setColor(Color.ORANGE);
+				pixels[_X.get(0)][_Y.get(0)].setPixel();
+				
+				cur = 1;
+				
+				isFirstStep = false;
+				drawButton.setEnabled(false);
+				prevStepButton.setEnabled(true);
+			}
+			else{
+				if(cur==_X.size()-1  && isStepNext){					
+					EnableButtons(false);
+					
+					pixels[_X.get(_X.size()-1)][_Y.get(_Y.size()-1)].setColor(Color.ORANGE);
+					pixels[_X.get(_X.size()-1)][_Y.get(_Y.size()-1)].setPixel();
+					
+					isFirstStep = true;
+					cur = 0;
+				}
+				else{
+					if(isStepNext){
+						pixels[_X.get(cur)][_Y.get(cur)].setColor(Color.ORANGE);
+						pixels[_X.get(cur)][_Y.get(cur)].setPixel();
+						cur++;
+					}
+					else{
+						cur--;
+						pixels[_X.get(cur)][_Y.get(cur)].clearCell();
+						if(cur==0){
+							isFirstStep = true;
+							prevStepButton.setEnabled(false);
+							drawButton.setEnabled(true);
+							pixels[_X.get(cur)][_Y.get(cur)].setColor(Color.ORANGE);
+							pixels[_X.get(cur)][_Y.get(cur)].setPixel();
+						}
+					}
+				}
+				
+			}
+		}
 	}
 	
 	private void DrawParabolAlgorithm(){
@@ -992,5 +1130,49 @@ public class Frame extends JFrame{
 		
 		pixels[_Y.get(_Y.size()-1)][_X.get(_X.size()-1)].setColor(Color.green);
 		pixels[_Y.get(_Y.size()-1)][_X.get(_X.size()-1)].setPixel();
+	}
+	
+	private void FillZatravkaAlgorithm(){
+		ZatravkaAlgorithm zt = new ZatravkaAlgorithm(pixels);
+		
+		_X = zt.getXList();
+		_Y = zt.getYList();
+		
+		for(int i=0; i<_X.size(); i++){
+			pixels[_X.get(i)][_Y.get(i)].setColor(Color.ORANGE);
+			pixels[_X.get(i)][_Y.get(i)].setPixel();
+		}
+	}
+	
+	private class FillButton extends AbstractAction{
+		
+		public FillButton(){
+			putValue(NAME, "Fill");
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			// TODO Auto-generated method stub
+			if(algorithmZatravki.isSelected()){
+				FillZatravkaAlgorithm();
+				Coordinates.isZatravka = true;
+			}
+			if(algorithmScan.isSelected()){
+				FillScanningAlgorithm();
+			}
+		}
+		
+	}
+	
+	private void FillScanningAlgorithm(){
+		ScanningAlgorithm sc = new ScanningAlgorithm(pixels);
+		
+		_X = sc.getXList();
+		_Y = sc.getYList();
+		
+		for(int i=0; i<_X.size(); i++){
+			pixels[_X.get(i)][_Y.get(i)].setColor(Color.ORANGE);
+			pixels[_X.get(i)][_Y.get(i)].setPixel();
+		}
 	}
 }

@@ -20,11 +20,14 @@ public class Cell extends JComponent implements MouseListener{
 	private int col;
 	private boolean isLiving;
 	
+	private boolean _isFill;
+	
 	private Color color;
 	
 	public Cell(int r, int c) {
 	    this.setRow(r);
 	    this.setCol(c);
+	    this._isFill = false;
 	    this.addMouseListener(this);
 	}
 	
@@ -32,16 +35,22 @@ public class Cell extends JComponent implements MouseListener{
 	    isLiving = alive;
 	}
 
-	public boolean isLiving() {
-	    return this.isLiving;
+	public boolean isFill() {
+	    return this._isFill;
+	}
+	
+	public void setFill(){
+		_isFill = true;
 	}
 	
 	public void paintComponent(Graphics g) {
 	    if (this.isLiving) {
 	    	g.setColor(getColor());
 	    	g.fillRect(0, 0, getWidth(), getHeight());
+	    	setFill();
 	    } else {
 	    	g.drawRect(0, 0, getWidth(), getHeight());
+	    	_isFill = false;
 	    }
 	}
 	
@@ -150,6 +159,15 @@ public class Cell extends JComponent implements MouseListener{
 		    	break;
 		    }
 		    
+		    case 5:{
+		    	Coordinates.x_1 = getColumn();
+		    	Coordinates.y_1 = getRow();
+		    	Frame.updateStatus("Select pixel");	
+		    	Frame.fillButton.setEnabled(true);
+		    	Frame.EnableButtons(true);
+		    	break;
+		    }
+		    
 		    }
 		    
 		}
@@ -192,6 +210,7 @@ public class Cell extends JComponent implements MouseListener{
 	
 	public void clearCell(){
 		this.isLiving = false;
+		this._isFill = false;
 		repaint();
 	}
 
