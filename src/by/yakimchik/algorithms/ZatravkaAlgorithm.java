@@ -33,15 +33,15 @@ public class ZatravkaAlgorithm {
 				_Y.add(cur.getColumn());
 			}
 			
-			if(cur.getRow()-1>=0){
-				if(!pixels[cur.getRow()-1][cur.getColumn()].isFill()){
-					stack.push(pixels[cur.getRow()-1][cur.getColumn()]);
+			if(cur.getColumn()+1<=69){
+				if(!pixels[cur.getRow()][cur.getColumn()+1].isFill()){
+					stack.push(pixels[cur.getRow()][cur.getColumn()+1]);
 				}
 			}
 			
-			if(cur.getRow()+1<=69){
-				if(!pixels[cur.getRow()+1][cur.getColumn()].isFill()){
-					stack.push(pixels[cur.getRow()+1][cur.getColumn()]);
+			if(cur.getRow()-1>=0){
+				if(!pixels[cur.getRow()-1][cur.getColumn()].isFill()){
+					stack.push(pixels[cur.getRow()-1][cur.getColumn()]);
 				}
 			}
 			
@@ -51,11 +51,13 @@ public class ZatravkaAlgorithm {
 				}
 			}
 			
-			if(cur.getColumn()+1<=69){
-				if(!pixels[cur.getRow()][cur.getColumn()+1].isFill()){
-					stack.push(pixels[cur.getRow()][cur.getColumn()+1]);
+			if(cur.getRow()+1<=69){
+				if(!pixels[cur.getRow()+1][cur.getColumn()].isFill()){
+					stack.push(pixels[cur.getRow()+1][cur.getColumn()]);
 				}
 			}
+			
+			
 		}
 		
 	}
