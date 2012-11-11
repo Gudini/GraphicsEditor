@@ -1,7 +1,6 @@
 package by.yakimchik.data;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /*
  * Coordinate of grid
@@ -42,4 +41,5 @@ public class Coordinates {
 	
 	public static ArrayList<Integer> xSegment = new ArrayList<Integer>();
 	public static ArrayList<Integer> ySegment = new ArrayList<Integer>();
+	
 }

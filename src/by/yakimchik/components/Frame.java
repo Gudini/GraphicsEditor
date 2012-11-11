@@ -1077,6 +1077,53 @@ public class Frame extends JFrame{
 				
 			}
 		}
+		
+		if(algorithmScan.isSelected()){
+			if(isFirstStep){
+				ScanningAlgorithm alg = new ScanningAlgorithm(pixels);
+				_X = alg.getXList();
+				_Y = alg.getYList();
+				
+				pixels[_X.get(0)][_Y.get(0)].setColor(Color.ORANGE);
+				pixels[_X.get(0)][_Y.get(0)].setPixel();
+				
+				cur = 1;
+				
+				isFirstStep = false;
+				drawButton.setEnabled(false);
+				prevStepButton.setEnabled(true);
+			}
+			else{
+				if(cur==_X.size()-1  && isStepNext){					
+					EnableButtons(false);
+					
+					pixels[_X.get(_X.size()-1)][_Y.get(_Y.size()-1)].setColor(Color.ORANGE);
+					pixels[_X.get(_X.size()-1)][_Y.get(_Y.size()-1)].setPixel();
+					
+					isFirstStep = true;
+					cur = 0;
+				}
+				else{
+					if(isStepNext){
+						pixels[_X.get(cur)][_Y.get(cur)].setColor(Color.ORANGE);
+						pixels[_X.get(cur)][_Y.get(cur)].setPixel();
+						cur++;
+					}
+					else{
+						cur--;
+						pixels[_X.get(cur)][_Y.get(cur)].clearCell();
+						if(cur==0){
+							isFirstStep = true;
+							prevStepButton.setEnabled(false);
+							drawButton.setEnabled(true);
+							pixels[_X.get(cur)][_Y.get(cur)].setColor(Color.ORANGE);
+							pixels[_X.get(cur)][_Y.get(cur)].setPixel();
+						}
+					}
+				}
+				
+			}
+		}
 	}
 	
 	private void DrawParabolAlgorithm(){
@@ -1155,11 +1202,13 @@ public class Frame extends JFrame{
 			// TODO Auto-generated method stub
 			if(algorithmZatravki.isSelected()){
 				FillZatravkaAlgorithm();
-				Coordinates.isZatravka = true;
 			}
 			if(algorithmScan.isSelected()){
 				FillScanningAlgorithm();
 			}
+			
+			EnableButtons(false);
+			fillButton.setEnabled(false);
 		}
 		
 	}
