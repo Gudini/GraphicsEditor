@@ -1144,6 +1144,10 @@ public class Frame extends JFrame{
 	}
 	
 	private void DrawBezeAlgorithm(){
+		
+		pixels[Coordinates.y_2][Coordinates.x_2].clearCell();
+		pixels[Coordinates.y_3][Coordinates.x_3].clearCell();
+		
 		BezeAlgotithm b = new BezeAlgotithm(paramBeze);
 		
 		_X = b.getXList();
