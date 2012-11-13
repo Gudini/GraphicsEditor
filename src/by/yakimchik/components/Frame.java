@@ -685,6 +685,7 @@ public class Frame extends JFrame{
 			Coordinates.isCoordinates = true;
 			
 			EnableButtons(false);
+			fillButton.setEnabled(false);
 		}
 	}
 	
@@ -1032,7 +1033,7 @@ public class Frame extends JFrame{
 			}
 		}
 		if(algorithmZatravki.isSelected()){
-			if(isFirstStep){
+			/*if(isFirstStep){
 				ZatravkaAlgorithm alg = new ZatravkaAlgorithm(pixels);
 				_X = alg.getXList();
 				_Y = alg.getYList();
@@ -1076,10 +1077,23 @@ public class Frame extends JFrame{
 				}
 				
 			}
+			*/
+			
+			ZatravkaAlgorithm zt = new ZatravkaAlgorithm(pixels);
+			
+			_X = zt.getXList();
+			_Y = zt.getYList();
+			
+			EnableButtons(false);
+			fillButton.setEnabled(false);
+			
+			DebugScanningThread thread = new DebugScanningThread();
+			Thread _th = new Thread(thread);
+			_th.start();
 		}
 		
 		if(algorithmScan.isSelected()){
-			if(isFirstStep){
+			/*if(isFirstStep){
 				ScanningAlgorithm alg = new ScanningAlgorithm(pixels);
 				_X = alg.getXList();
 				_Y = alg.getYList();
@@ -1116,17 +1130,30 @@ public class Frame extends JFrame{
 							isFirstStep = true;
 							prevStepButton.setEnabled(false);
 							drawButton.setEnabled(true);
-							pixels[_X.get(cur)][_Y.get(cur)].setColor(Color.ORANGE);
+							pixels[_X.get(cur)][_Y.get(cur)].
+							setColor(Color.ORANGE);
 							pixels[_X.get(cur)][_Y.get(cur)].setPixel();
 						}
 					}
 				}
 				
-			}
+			}*/
+			ScanningAlgorithm sc = new ScanningAlgorithm(pixels);
+			
+			_X = sc.getXList();
+			_Y = sc.getYList();
+			
+			EnableButtons(false);
+			fillButton.setEnabled(false);
+			
+			DebugScanningThread thread = new DebugScanningThread();
+			Thread _th = new Thread(thread);
+			_th.start();
 		}
 	}
 	
 	private void DrawParabolAlgorithm(){
+		
 		ParabolaAlgorithm p = new ParabolaAlgorithm(paramParabola);
 		_X = p.getXList();
 		_Y = p.getYList();
@@ -1227,5 +1254,27 @@ public class Frame extends JFrame{
 			pixels[_X.get(i)][_Y.get(i)].setColor(Color.ORANGE);
 			pixels[_X.get(i)][_Y.get(i)].setPixel();
 		}
+	}
+	
+	private class DebugScanningThread implements Runnable{
+
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+			nextStepButton.setEnabled(false);
+			
+			for(int i=0; i<_X.size(); i++){
+				pixels[_X.get(i)][_Y.get(i)].setColor(Color.ORANGE);
+				pixels[_X.get(i)][_Y.get(i)].setPixel();
+				
+				try{
+					Thread.sleep(100);
+				}
+				catch(InterruptedException ex){
+					
+				}
+			} 
+		}
+		
 	}
 }
