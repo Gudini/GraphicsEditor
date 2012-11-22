@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.FileDialog;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 
 import javax.swing.*;
 import javax.swing.border.Border;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import by.yakimchik.data.Coordinates;
 import by.yakimchik.algorithms.*;
@@ -247,6 +249,9 @@ public class Frame extends JFrame{
 	
 	private JMenu createFileMenu(){
 		JMenu file = new JMenu("File");
+		JMenuItem openItem = new JMenuItem(new OpenAction());
+		file.add(openItem);
+		file.add(new JSeparator());
 		JMenuItem exitItem = new JMenuItem(new ExitAction());
 		file.add(exitItem);
 		
@@ -1248,5 +1253,24 @@ public class Frame extends JFrame{
 			content = f.getContentPane();
 		}
 		
+	}
+	
+	private class OpenAction extends AbstractAction{
+		
+		public OpenAction(){
+			putValue(NAME, "Open");
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			// TODO Auto-generated method stub
+			JFileChooser fileDialog = new JFileChooser("D:\\Projects\\Java\\GraphicsEditor\\figure");
+			FileNameExtensionFilter filter = new FileNameExtensionFilter("XML", "xml");
+			fileDialog.setFileFilter(filter);
+			int openChoice = fileDialog.showOpenDialog(content);
+			if(openChoice==JFileChooser.APPROVE_OPTION){
+				
+			}
+		}
 	}
 }
