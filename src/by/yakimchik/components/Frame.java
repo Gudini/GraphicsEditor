@@ -47,6 +47,9 @@ public class Frame extends JFrame{
 	private static JCheckBoxMenuItem algorithmBeze;
 	private static JCheckBoxMenuItem algorithmBSpline;
 	
+	private JMenu draw;
+	private JMenu fill;
+	
 	/** Menu of Fill menu */
 	private static JCheckBoxMenuItem algorithmZatravki;
 	private static JCheckBoxMenuItem algorithmScan;
@@ -71,7 +74,9 @@ public class Frame extends JFrame{
 	private static int paramSpline = 50;
 	private static int paramCountPoints = 4;
 	
-	public Frame(){
+	private GraphicsScene scene;
+	
+	public Frame(boolean type_of_window){
 		super("Graphics Editor");
 		
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -101,10 +106,14 @@ public class Frame extends JFrame{
 		
 		content = getContentPane();
 		
-		JScrollPane pane = new JScrollPane(creatPanelCells());
-		content.add(pane);
+		scene = new GraphicsScene();
 		
-		content.add(status, BorderLayout.SOUTH);
+		if(type_of_window){
+			createPixelsWindow();
+		}
+		else{
+			createScene();
+		}
 		
 		this.addWindowListener(new WindowListener() {
 			
@@ -157,15 +166,15 @@ public class Frame extends JFrame{
 				
 			}
 		});
-		isFirstStep = true;
 		
-		drawButton = new JButton("Draw");
-		drawButton.setAction(new DrawButton());
+		setVisible(true);
+	}
+	
+	private void createPixelsWindow(){
+		JScrollPane pane = new JScrollPane(creatPanelCells());
+		content.add(pane);
 		
-		fillButton = new JButton("Fill");
-		fillButton.setAction(new FillButton());
-		fillButton.setEnabled(false);
-		
+		content.add(status, BorderLayout.SOUTH);
 		
 		nextStepButton = new JButton(new AbstractAction() {
 			
@@ -188,15 +197,22 @@ public class Frame extends JFrame{
 		
 		enable = false;
 		
+		prevStepButton.setAlignmentX(-20);
+		nextStepButton.setAlignmentX(20);
+		
+		drawButton = new JButton("Draw");
+		drawButton.setAction(new DrawButton());
+		
+		fillButton = new JButton("Fill");
+		fillButton.setAction(new FillButton());
+		fillButton.setEnabled(false);
+		
 		JPanel debugPanel = new JPanel();
 		Border eastBorder = BorderFactory.createTitledBorder("Debug");
 		debugPanel.setBorder(eastBorder);
 		debugPanel.setLayout(new BoxLayout(debugPanel, BoxLayout.X_AXIS));
 		debugPanel.add(prevStepButton);
 		debugPanel.add(nextStepButton);
-		prevStepButton.setAlignmentX(-20);
-		nextStepButton.setAlignmentX(20);
-		
 		
 		JPanel east_panel = new JPanel();
 		east_panel.setLayout(new BoxLayout(east_panel, BoxLayout.Y_AXIS));
@@ -204,7 +220,7 @@ public class Frame extends JFrame{
 		east_panel.add(fillButton);
 		drawButton.setAlignmentX(CENTER_ALIGNMENT);
 		fillButton.setAlignmentX(CENTER_ALIGNMENT);
-		EnableButtons(false);
+		
 		east_panel.add(debugPanel, BorderLayout.NORTH);
 		
 		//clear button
@@ -215,7 +231,18 @@ public class Frame extends JFrame{
 		
 		content.add(east_panel, BorderLayout.EAST);
 		
-		setVisible(true);
+		isFirstStep = true;
+		
+		EnableButtons(false);
+		
+	}
+	
+	private void createScene(){
+		JScrollPane pane = new JScrollPane(scene);
+		content.add(scene);
+		
+		draw.setEnabled(false);
+		fill.setEnabled(false);
 	}
 	
 	private JMenu createFileMenu(){
@@ -227,7 +254,7 @@ public class Frame extends JFrame{
 	}
 	
 	private JMenu createDrawMenu(){
-		JMenu draw = new JMenu("Draw");
+		draw = new JMenu("Draw");
 		JMenu lineDraw = new JMenu("Line");
 		JMenu conicDraw = new JMenu("Conic");
 		JMenu curveDraw = new JMenu("Curve");
@@ -563,6 +590,11 @@ public class Frame extends JFrame{
 	
 	private JMenu createWindowMenu(){
 		JMenu window = new JMenu("Window");
+		JMenuItem sceneItem = new JMenuItem(new SceneAction());
+		JMenuItem pixelsItem = new JMenuItem(new PixelsAction());
+		window.add(new JSeparator());
+		window.add(sceneItem);
+		window.add(pixelsItem);
 		JMenuItem clearItem = new JMenuItem(new ClearAction());
 		window.add(clearItem);
 		
@@ -570,7 +602,7 @@ public class Frame extends JFrame{
 	}
 	
 	private JMenu createFillMenu(){
-		JMenu fill = new JMenu("Fill");
+		fill = new JMenu("Fill");
 		
 		algorithmZatravki = new JCheckBoxMenuItem(new AbstractAction() {
 			
@@ -1032,53 +1064,7 @@ public class Frame extends JFrame{
 				
 			}
 		}
-		if(algorithmZatravki.isSelected()){
-			/*if(isFirstStep){
-				ZatravkaAlgorithm alg = new ZatravkaAlgorithm(pixels);
-				_X = alg.getXList();
-				_Y = alg.getYList();
-				
-				pixels[_X.get(0)][_Y.get(0)].setColor(Color.ORANGE);
-				pixels[_X.get(0)][_Y.get(0)].setPixel();
-				
-				cur = 1;
-				
-				isFirstStep = false;
-				drawButton.setEnabled(false);
-				prevStepButton.setEnabled(true);
-			}
-			else{
-				if(cur==_X.size()-1  && isStepNext){					
-					EnableButtons(false);
-					
-					pixels[_X.get(_X.size()-1)][_Y.get(_Y.size()-1)].setColor(Color.ORANGE);
-					pixels[_X.get(_X.size()-1)][_Y.get(_Y.size()-1)].setPixel();
-					
-					isFirstStep = true;
-					cur = 0;
-				}
-				else{
-					if(isStepNext){
-						pixels[_X.get(cur)][_Y.get(cur)].setColor(Color.ORANGE);
-						pixels[_X.get(cur)][_Y.get(cur)].setPixel();
-						cur++;
-					}
-					else{
-						cur--;
-						pixels[_X.get(cur)][_Y.get(cur)].clearCell();
-						if(cur==0){
-							isFirstStep = true;
-							prevStepButton.setEnabled(false);
-							drawButton.setEnabled(true);
-							pixels[_X.get(cur)][_Y.get(cur)].setColor(Color.ORANGE);
-							pixels[_X.get(cur)][_Y.get(cur)].setPixel();
-						}
-					}
-				}
-				
-			}
-			*/
-			
+		if(algorithmZatravki.isSelected()){			
 			ZatravkaAlgorithm zt = new ZatravkaAlgorithm(pixels);
 			
 			_X = zt.getXList();
@@ -1093,51 +1079,6 @@ public class Frame extends JFrame{
 		}
 		
 		if(algorithmScan.isSelected()){
-			/*if(isFirstStep){
-				ScanningAlgorithm alg = new ScanningAlgorithm(pixels);
-				_X = alg.getXList();
-				_Y = alg.getYList();
-				
-				pixels[_X.get(0)][_Y.get(0)].setColor(Color.ORANGE);
-				pixels[_X.get(0)][_Y.get(0)].setPixel();
-				
-				cur = 1;
-				
-				isFirstStep = false;
-				drawButton.setEnabled(false);
-				prevStepButton.setEnabled(true);
-			}
-			else{
-				if(cur==_X.size()-1  && isStepNext){					
-					EnableButtons(false);
-					
-					pixels[_X.get(_X.size()-1)][_Y.get(_Y.size()-1)].setColor(Color.ORANGE);
-					pixels[_X.get(_X.size()-1)][_Y.get(_Y.size()-1)].setPixel();
-					
-					isFirstStep = true;
-					cur = 0;
-				}
-				else{
-					if(isStepNext){
-						pixels[_X.get(cur)][_Y.get(cur)].setColor(Color.ORANGE);
-						pixels[_X.get(cur)][_Y.get(cur)].setPixel();
-						cur++;
-					}
-					else{
-						cur--;
-						pixels[_X.get(cur)][_Y.get(cur)].clearCell();
-						if(cur==0){
-							isFirstStep = true;
-							prevStepButton.setEnabled(false);
-							drawButton.setEnabled(true);
-							pixels[_X.get(cur)][_Y.get(cur)].
-							setColor(Color.ORANGE);
-							pixels[_X.get(cur)][_Y.get(cur)].setPixel();
-						}
-					}
-				}
-				
-			}*/
 			ScanningAlgorithm sc = new ScanningAlgorithm(pixels);
 			
 			_X = sc.getXList();
@@ -1274,6 +1215,37 @@ public class Frame extends JFrame{
 					
 				}
 			} 
+		}
+	}
+	
+	private class SceneAction extends AbstractAction{
+		
+		public SceneAction(){
+			putValue(NAME, "Scene");
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			// TODO Auto-generated method stub
+			setVisible(false);
+			Frame f = new Frame(false);
+			content = f.getContentPane();
+		}
+		
+	}
+	
+	private class PixelsAction extends AbstractAction{
+
+		public PixelsAction(){
+			putValue(NAME, "Pixels window");
+		}
+		
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO Auto-generated method stub'
+			setVisible(false);
+			Frame f = new Frame(true);
+			content = f.getContentPane();
 		}
 		
 	}
